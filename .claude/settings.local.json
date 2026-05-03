@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude skill *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npm --version)",
+      "Bash(curl --version)",
+      "Bash(git --version)",
+      "Bash(mkdir -p ~/.claude/skills)",
+      "Bash(cp -r /tmp/ui-ux-pro-max-skill/.claude/skills/* ~/.claude/skills/)",
+      "Bash(npx -y @21st-dev/cli@latest install cursor --api-key \"cdb0c37d6fe4c710696945d57d91503113acac349fb8096bad2ff9d5136c7c1c\")",
+      "Read(//Users/pascal/**)",
+      "Bash(brew --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(kill 27605)",
+      "Bash(xargs kill *)",
+      "Bash(npx next *)",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:drive.google.com)"
+    ]
+  }
+}
