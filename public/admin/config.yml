@@ -1,0 +1,75 @@
+backend:
+  name: github
+  repo: Huskymillion/Portfolio_PP_2026  # ← fill in before deploying
+  branch: main
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: projects
+    label: Projects
+    folder: content/projects
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title,       name: title,       widget: string }
+      - { label: Slug,        name: slug,         widget: string }
+      - { label: Year,        name: year,         widget: number }
+      - { label: Category,    name: category,     widget: string }
+      - { label: Client,      name: client,       widget: string }
+      - { label: Accent Color, name: accent,      widget: string, default: "#1a1a2e", hint: "CSS hex color for this project card" }
+      - { label: Layout,      name: layout,       widget: select, options: [video16x9, grid9x16], default: video16x9 }
+      - { label: Has Timeline, name: hasTimeline, widget: boolean, default: false }
+      - { label: Cover Image, name: coverImage,   widget: image,  required: false }
+      - label: Media
+        name: media
+        widget: list
+        fields:
+          - { label: Type,    name: type,    widget: select, options: [image, video] }
+          - { label: File,    name: file,    widget: file }
+          - { label: Caption, name: caption, widget: string, required: false }
+      - { label: Services,    name: services,    widget: string }
+      - { label: Description, name: description, widget: text }
+      - { label: Tags,        name: tags,        widget: list,    required: false }
+      - { label: Featured,    name: featured,    widget: boolean, default: false }
+      - { label: Published,   name: published,   widget: boolean, default: true }
+
+  - name: clients
+    label: Clients
+    folder: content/clients
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Name,     name: name,     widget: string }
+      - { label: Logo,     name: logo,     widget: image,  required: false }
+      - { label: URL,      name: url,      widget: string, required: false }
+      - { label: Industry, name: industry, widget: string, required: false }
+      - { label: Order,    name: order,    widget: number, default: 99 }
+
+  - name: settings
+    label: Site Settings
+    files:
+      - label: Hero
+        name: hero
+        file: content/settings/hero.md
+        fields:
+          - { label: Left Words,  name: leftWords,  widget: list, default: [video, social video, motion, motion graphics, creative content, creative content producer] }
+          - { label: Right Words, name: rightWords, widget: list, default: [homebase, züri, start of the creative journey, munich, studies abroad, sweden, "born&raised", allgäu] }
+          - { label: Reel URL,    name: reelUrl,    widget: string, required: false }
+      - label: About
+        name: about
+        file: content/settings/about.md
+        fields:
+          - { label: Headline, name: headline, widget: string }
+          - { label: Bio,      name: bio,      widget: text }
+          - { label: Location, name: location, widget: string }
+          - { label: Email,    name: email,    widget: string }
+      - label: Contact
+        name: contact
+        file: content/settings/contact.md
+        fields:
+          - { label: Email,     name: email,     widget: string }
+          - { label: Phone,     name: phone,     widget: string }
+          - { label: Instagram, name: instagram, widget: string }
+          - { label: LinkedIn,  name: linkedin,  widget: string }
