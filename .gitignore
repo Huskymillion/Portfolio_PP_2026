@@ -20,6 +20,11 @@
 # production
 /build
 
+# claude
+CLAUDE.md
+AGENTS.md
+/.claude/
+
 # misc
 .DS_Store
 *.pem
