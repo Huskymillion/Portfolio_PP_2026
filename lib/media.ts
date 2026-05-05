@@ -53,7 +53,7 @@ const DRIVE_IDS: Record<string, DriveMap> = {
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
   },
   "05": { // schweizer paraplegiker stiftung
-    "hero":   "",
+    "hero":   "1s--altezqumcSlHGUB-OSu6gsH_arIcD",
     "poster": "",
     "thumb":  "",
   },
