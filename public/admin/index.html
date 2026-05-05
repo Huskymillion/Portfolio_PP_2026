@@ -4,10 +4,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CMS — pascal pfohl</title>
-  <!-- Decap CMS loaded from CDN — no bundler involved -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <!--
+    Prevent Decap CMS from auto-initialising so we can inject
+    base_url dynamically (works on localhost AND any deployed URL).
+  -->
+  <script>window.CMS_MANUAL_INIT = true;</script>
 </head>
 <body>
-  <!-- CMS mounts here automatically via the script above + config.yml -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    /**
+     * CMS.init() merges with config.yml.
+     * We only override the backend fields that must be dynamic;
+     * collections, media_folder, etc. come from config.yml as usual.
+     */
+    CMS.init({
+      config: {
+        backend: {
+          base_url:      window.location.origin, // resolves to localhost:3000 OR your deployed domain
+          auth_endpoint: "api/auth",             // → GET /api/auth  (our Next.js route handler)
+        },
+      },
+    });
+  </script>
 </body>
 </html>
