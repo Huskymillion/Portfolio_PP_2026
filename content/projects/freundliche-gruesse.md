@@ -6,10 +6,11 @@ category: Agency
 client: freundliche grüsse
 accent: "#2d2d2d"
 layout: grid9x16
-hasTimeline: false
+hasTimeline: true
 services: video + motion + concept + photography + edit
 tagline: zürich's creative agency for bold ideas
-description: Ongoing content production across video, motion and photography for one of Zurich's most distinct creative studios.
+description: Ongoing content production across video, motion and photography for
+  one of Zurich's most distinct creative studios.
 tags:
   - video
   - motion
