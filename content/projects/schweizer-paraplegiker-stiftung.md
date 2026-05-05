@@ -8,7 +8,8 @@ accent: "#533483"
 layout: video16x9
 hasTimeline: false
 services: video + concept + motion + edit
-description: Photography and campaign production for the Schweizer Paraplegiker Stiftung.
+tagline: support. dignity. independence.
+description: Sensitive and human-centred video storytelling for one of Switzerland's most important healthcare foundations.
 tags:
   - photography
   - campaign

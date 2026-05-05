@@ -1,22 +1,72 @@
 export type Layout = "video16x9" | "grid9x16" | "timeline";
 
 export interface Project {
-  id:       string;
-  name:     string;
-  type:     string;
-  services: string;
-  layout:   Layout;
-  extra?:   Layout;
-  accent:   string;
+  id:          string;
+  name:        string;
+  type:        string;
+  services:    string;
+  layout:      Layout;
+  extra?:      Layout;
+  accent:      string;
+  tagline?:    string;
+  description?: string;
 }
 
 export const PROJECTS: Project[] = [
-  { id: "01", name: "köttur",                         type: "streetwear brand",           services: "concept + creative direction + campaign",                    layout: "video16x9", extra: "timeline",  accent: "#1a1a2e" },
-  { id: "02", name: "freundliche grüsse",              type: "creative agency zurich",     services: "video + motion + concept + photography + edit",              layout: "grid9x16",                     accent: "#2d2d2d" },
-  { id: "03", name: "ewz",                             type: "energy provider",            services: "video + motion + edit",                                      layout: "grid9x16",                     accent: "#0f3460" },
-  { id: "04", name: "sfv",                             type: "Swiss Football Association", services: "video + motion + concept + edit",                            layout: "grid9x16",                     accent: "#e94560" },
-  { id: "05", name: "schweizer paraplegiker stiftung", type: "healthcare",                 services: "video + concept + motion + edit",                            layout: "video16x9",                    accent: "#533483" },
-  { id: "06", name: "kapo bern",                       type: "cantonal police",            services: "video + photography + motion + edit",                        layout: "video16x9", extra: "timeline", accent: "#0b3d91" },
-  { id: "07", name: "kfh",                             type: "health care",                services: "photography + concept",                                      layout: "video16x9", extra: "timeline", accent: "#1b4332" },
-  { id: "08", name: "mawave",                          type: "social first agency",        services: "video + motion + concept + photography + edit + design",     layout: "grid9x16",                     accent: "#3d0000" },
+  {
+    id: "01", name: "köttur", type: "streetwear brand",
+    services: "concept + creative direction + campaign",
+    layout: "video16x9", extra: "timeline", accent: "#1a1a2e",
+    tagline:     "a sustainable streetwear label from the allgäu",
+    description: "Concept, creative direction and full campaign production for köttur — a brand built around conscious fashion and raw visual identity.",
+  },
+  {
+    id: "02", name: "freundliche grüsse", type: "creative agency zurich",
+    services: "video + motion + concept + photography + edit",
+    layout: "grid9x16", accent: "#2d2d2d",
+    tagline:     "zürich's creative agency for bold ideas",
+    description: "Ongoing content production across video, motion and photography for one of Zurich's most distinct creative studios.",
+  },
+  {
+    id: "03", name: "ewz", type: "energy provider",
+    services: "video + motion + edit",
+    layout: "grid9x16", accent: "#0f3460",
+    tagline:     "energy for the city of zurich",
+    description: "Video and motion work translating ewz's commitment to sustainable urban energy into compelling visual storytelling.",
+  },
+  {
+    id: "04", name: "sfv", type: "Swiss Football Association",
+    services: "video + motion + concept + edit",
+    layout: "grid9x16", accent: "#e94560",
+    tagline:     "football is more than a game",
+    description: "Campaign and editorial video production for the Swiss Football Association — capturing the emotion and culture of the sport.",
+  },
+  {
+    id: "05", name: "schweizer paraplegiker stiftung", type: "healthcare",
+    services: "video + concept + motion + edit",
+    layout: "video16x9", accent: "#533483",
+    tagline:     "support. dignity. independence.",
+    description: "Sensitive and human-centred video storytelling for one of Switzerland's most important healthcare foundations.",
+  },
+  {
+    id: "06", name: "kapo bern", type: "cantonal police",
+    services: "video + photography + motion + edit",
+    layout: "video16x9", extra: "timeline", accent: "#0b3d91",
+    tagline:     "serving and protecting the canton",
+    description: "Photography, video and motion production for the Cantonal Police of Bern — balancing authority with approachability.",
+  },
+  {
+    id: "07", name: "kfh", type: "health care",
+    services: "photography + concept",
+    layout: "video16x9", extra: "timeline", accent: "#1b4332",
+    tagline:     "health care, humanised",
+    description: "Concept and photography work for KFH, translating a complex healthcare brand into warm, accessible visual communication.",
+  },
+  {
+    id: "08", name: "mawave", type: "social first agency",
+    services: "video + motion + concept + photography + edit + design",
+    layout: "grid9x16", accent: "#3d0000",
+    tagline:     "we translate brands to social media",
+    description: "As creative content producer, responsible for the full outbound visual representation and concept — translating brands into scroll-stopping social content.",
+  },
 ];

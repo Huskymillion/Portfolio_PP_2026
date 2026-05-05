@@ -8,7 +8,8 @@ accent: "#3d0000"
 layout: grid9x16
 hasTimeline: false
 services: video + motion + concept + photography + edit + design
-description: Video, motion, concept and art direction for mawave — a social-first creative agency.
+tagline: we translate brands to social media
+description: As creative content producer, responsible for the full outbound visual representation and concept — translating brands into scroll-stopping social content.
 tags:
   - video
   - motion

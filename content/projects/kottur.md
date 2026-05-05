@@ -8,7 +8,8 @@ accent: "#1a1a2e"
 layout: video16x9
 hasTimeline: true
 services: concept + creative direction + campaign
-description: Full creative direction for the köttur streetwear brand — from concept and visual identity through to campaign production.
+tagline: a sustainable streetwear label from the allgäu
+description: Concept, creative direction and full campaign production for köttur — a brand built around conscious fashion and raw visual identity.
 tags:
   - branding
   - campaign

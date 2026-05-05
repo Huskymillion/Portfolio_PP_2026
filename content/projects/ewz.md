@@ -8,7 +8,8 @@ accent: "#0f3460"
 layout: grid9x16
 hasTimeline: false
 services: video + motion + edit
-description: Photography, concept and campaign for ewz — Zürich's energy provider.
+tagline: energy for the city of zurich
+description: Video and motion work translating ewz's commitment to sustainable urban energy into compelling visual storytelling.
 tags:
   - photography
   - concept

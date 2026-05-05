@@ -8,7 +8,8 @@ accent: "#2d2d2d"
 layout: grid9x16
 hasTimeline: false
 services: video + motion + concept + photography + edit
-description: Art direction, concept and campaign production for the Zurich-based creative agency freundliche grüsse.
+tagline: zürich's creative agency for bold ideas
+description: Ongoing content production across video, motion and photography for one of Zurich's most distinct creative studios.
 tags:
   - video
   - motion

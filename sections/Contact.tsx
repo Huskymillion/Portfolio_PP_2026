@@ -138,6 +138,13 @@ export function Contact() {
         borderTop:  "2px solid #000",
       }}
     >
+      <style>{`
+        @media (max-width: 1023px) {
+          #contact {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);
+          }
+        }
+      `}</style>
 
       {/* ── Row 0 : Header — Year + Location + Name ── */}
       <div
@@ -262,7 +269,7 @@ export function Contact() {
         <span style={{ fontFamily: FONT_BRIER, fontStyle: "italic" }}>{"»"}</span>
         <span>&#9658;</span>
         <Link href="https://www.linkedin.com/in/pascal-pfohl-950a70173/">
-          &#174;inkedIn
+          LinkedIn
         </Link>
         <Sep />
         <span>&#9679;</span>

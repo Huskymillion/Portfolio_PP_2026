@@ -30,7 +30,8 @@ collections:
           - { label: File,    name: file,    widget: file }
           - { label: Caption, name: caption, widget: string, required: false }
       - { label: Services,    name: services,    widget: string }
-      - { label: Description, name: description, widget: text }
+      - { label: Tagline,     name: tagline,     widget: string, required: false, hint: "Short italic line shown under the project title — one sentence max" }
+      - { label: Description, name: description, widget: text,   required: false, hint: "Context paragraph shown below the media. 1–3 sentences." }
       - { label: Tags,        name: tags,        widget: list,    required: false }
       - { label: Featured,    name: featured,    widget: boolean, default: false }
       - { label: Published,   name: published,   widget: boolean, default: true }

@@ -8,7 +8,8 @@ accent: "#e94560"
 layout: grid9x16
 hasTimeline: false
 services: video + motion + concept + edit
-description: Video production, motion graphics and concept for the Swiss Football Association.
+tagline: football is more than a game
+description: Campaign and editorial video production for the Swiss Football Association — capturing the emotion and culture of the sport.
 tags:
   - video
   - motion

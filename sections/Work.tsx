@@ -97,7 +97,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
         transition={{ duration: 0.15 }}
         style={{
           flexShrink:     0,
-          padding:        "0.3em 0.85em",
+          padding:        "0.55em 1.4em",
           borderRadius:   "9999px",
           border:         "2px solid #0a0a0a",
           display:        "flex",
@@ -108,7 +108,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
         <motion.span
           animate={{ color: active ? "#fff" : "#0a0a0a" }}
           transition={{ duration: 0.15 }}
-          style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.75rem, 1.2vw, 1.1rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1 }}
+          style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.35rem, 2.3vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1 }}
         >
           {project.id}
         </motion.span>
@@ -170,7 +170,7 @@ export function WorkIndex() {
     >
       <Thumbnail project={hovered} visible={!!hovered} x={cursorPos.x} y={cursorPos.y} />
 
-      <div style={{ maxWidth: "min(1280px, 96vw)", margin: "0 auto" }}>
+      <div>
 
         {/* Section label */}
         <div style={{ display: "flex", alignItems: "baseline", gap: "2rem", marginBottom: "clamp(2rem, 5vh, 4rem)", borderTop: "2px solid #0a0a0a", paddingTop: "1.5rem" }}>
@@ -460,18 +460,35 @@ export function FullscreenVideo({ project }: { project: Project }) {
 /* ─── 9×16 Social Video — stacked fan ──────────── */
 
 const CARD_COUNT = 5;
-const CARD_W     = 180;  // px
-const CARD_H     = Math.round(CARD_W * 16 / 9); // 320px
-const CARD_SPACING = 130; // px between card centres
+
+function useCardDims() {
+  const [dims, setDims] = useState({ w: 180, h: 320, spacing: 130 });
+  useEffect(() => {
+    function calc() {
+      const vw = window.innerWidth;
+      const w  = vw >= 1024
+        ? Math.min(Math.round(vw * 0.21), 320)
+        : 180;
+      setDims({ w, h: Math.round(w * 16 / 9), spacing: Math.round(w * 0.72) });
+    }
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, []);
+  return dims;
+}
 
 function SocialCard({
-  project, index, hoveredIndex, setHoveredIndex, forcePause,
+  project, index, hoveredIndex, setHoveredIndex, forcePause, cardW, cardH, cardSpacing,
 }: {
   project:         Project;
   index:           number;
   hoveredIndex:    number | null;
   setHoveredIndex: (i: number | null) => void;
   forcePause:      boolean;
+  cardW:           number;
+  cardH:           number;
+  cardSpacing:     number;
 }) {
   const videoRef  = useRef<HTMLVideoElement>(null);
   const isHovered = hoveredIndex === index;
@@ -485,7 +502,7 @@ function SocialCard({
   const centre   = (CARD_COUNT - 1) / 2;
   const offset   = index - centre;
   const baseZ    = CARD_COUNT - Math.abs(Math.round(offset));
-  const rotation = offset * 5;
+  const rotation = offset * 4;
   const isDimmed = hoveredIndex !== null && !isHovered;
 
   const handleHover = (on: boolean) => {
@@ -511,7 +528,7 @@ function SocialCard({
       onHoverStart={() => handleHover(true)}
       onHoverEnd={() => handleHover(false)}
       animate={{
-        x:       offset * CARD_SPACING,
+        x:       offset * cardSpacing,
         rotate:  isHovered ? 0 : rotation,
         scale:   isHovered ? 1.08 : 1,
         zIndex:  isHovered ? 50 : baseZ,
@@ -520,8 +537,8 @@ function SocialCard({
       transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
       style={{
         position:        "absolute",
-        width:           CARD_W,
-        height:          CARD_H,
+        width:           cardW,
+        height:          cardH,
         borderRadius:    14,
         overflow:        "hidden",
         background:      project.accent,
@@ -542,6 +559,17 @@ function SocialCard({
         muted={muted}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
       />
+
+      {/* Play indicator — bare triangle, 65% → 100% on hover */}
+      <motion.div
+        animate={{ opacity: isHovered ? 1 : 0.65 }}
+        transition={{ duration: 0.22 }}
+        style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, pointerEvents: "none" }}
+      >
+        <svg width="14" height="16" viewBox="0 0 12 14" fill="none" aria-label="Play">
+          <polygon points="1,1 11,7 1,13" fill="#fff" />
+        </svg>
+      </motion.div>
 
       {/* Bottom gradient for label legibility */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75))", zIndex: 1, pointerEvents: "none" }} />
@@ -579,6 +607,7 @@ export function SocialGrid({ project }: { project: Project }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [offScreen,    setOffScreen]    = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { w: cardW, h: cardH, spacing: cardSpacing } = useCardDims();
 
   /* Pause all videos when this section scrolls off screen */
   useEffect(() => {
@@ -598,15 +627,16 @@ export function SocialGrid({ project }: { project: Project }) {
       ref={containerRef}
       style={{
         position:       "relative",
-        height:         CARD_H + 80,
+        height:         cardH + 80,
         display:        "flex",
         alignItems:     "center",
         justifyContent: "center",
-        padding:        "clamp(2rem, 5vh, 4rem) 0",
+        paddingTop:     "clamp(2rem, 5vh, 4rem)",
+        paddingBottom:  cardW > 180 ? "0.75rem" : "clamp(2rem, 5vh, 4rem)",
         overflow:       "visible",
       }}
     >
-      <div style={{ position: "relative", width: CARD_W, height: CARD_H }}>
+      <div style={{ position: "relative", width: cardW, height: cardH }}>
         {Array.from({ length: CARD_COUNT }, (_, i) => (
           <SocialCard
             key={i}
@@ -615,6 +645,9 @@ export function SocialGrid({ project }: { project: Project }) {
             hoveredIndex={hoveredIndex}
             setHoveredIndex={setHoveredIndex}
             forcePause={offScreen}
+            cardW={cardW}
+            cardH={cardH}
+            cardSpacing={cardSpacing}
           />
         ))}
       </div>
@@ -793,18 +826,24 @@ function CaseStudyMeta({ project }: { project: Project }) {
         justifyContent:"space-between",
         gap:           "2rem",
         padding:       "clamp(2rem, 4vh, 3.5rem) clamp(1.5rem, 5vw, 5rem) clamp(1.25rem, 2.5vh, 2rem)",
-        borderBottom:  "1px solid rgba(0,0,0,0.1)",
         flexShrink:    0,
       }}
     >
-      {/* Left: number + name */}
-      <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(1rem, 2vw, 2.5rem)", minWidth: 0 }}>
-        <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.65rem, 0.9vw, 0.85rem)", color: ACCENT, letterSpacing: "0.1em", flexShrink: 0 }}>
+      {/* Left: number + name + tagline */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(1rem, 2vw, 2.5rem)", minWidth: 0 }}>
+        <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.65rem, 0.9vw, 0.85rem)", color: ACCENT, letterSpacing: "0.1em", flexShrink: 0, paddingTop: "0.2em" }}>
           {project.id}
         </span>
-        <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: "#0a0a0a" }}>
-          {project.name}
-        </span>
+        <div>
+          <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: "#0a0a0a" }}>
+            {project.name}
+          </div>
+          {project.tagline && (
+            <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.72rem, 1vw, 0.92rem)", fontStyle: "italic", color: "#777", marginTop: "0.35em", letterSpacing: "0.01em" }}>
+              {project.tagline}
+            </div>
+          )}
+        </div>
       </div>
       {/* Right: type + services */}
       <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -830,8 +869,9 @@ export function CaseStudy({ project }: { project: Project }) {
       style={{
         background: "#fafafa",
         position:   "relative",
-        overflowX:  hasTimeline ? "clip" : "hidden",
-        overflowY:  hasTimeline ? "visible" : "hidden",
+        minHeight:  "100vh",
+        overflowX:  hasTimeline ? "clip" : (project.layout === "grid9x16" ? "clip" : "hidden"),
+        overflowY:  hasTimeline ? "visible" : "clip",
       }}
     >
 
@@ -851,8 +891,35 @@ export function CaseStudy({ project }: { project: Project }) {
       >
         <CaseStudyMeta project={project} />
 
+        {/* Description block — sits between header and media */}
+        {project.description && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              padding: "clamp(0.75rem, 2vh, 1.5rem) clamp(1.5rem, 5vw, 5rem)",
+            }}
+          >
+            <p
+              style={{
+                fontFamily:  FONT_MONA,
+                fontSize:    "clamp(0.88rem, 1.1vw, 1rem)",
+                fontWeight:  400,
+                color:       "#555",
+                lineHeight:  1.7,
+                maxWidth:    "800px",
+                margin:      0,
+              }}
+            >
+              {project.description}
+            </p>
+          </motion.div>
+        )}
+
         {/* Content fills remaining viewport height */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
           {project.layout === "video16x9" && (
             <FullscreenVideo project={project} />
           )}

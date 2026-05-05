@@ -1,6 +1,7 @@
 import { Hero }                  from "@/sections/Hero";
 import { About }                 from "@/sections/About";
 import { WorkIndex, CaseStudy }  from "@/sections/Work";
+import { ExtendedAbout }         from "@/sections/ExtendedAbout";
 import { Brands }                from "@/sections/Brands";
 import { Contact }               from "@/sections/Contact";
 import { PROJECTS }              from "@/lib/projects";
@@ -32,7 +33,10 @@ export default function Home() {
         <CaseStudy key={p.id} project={p} />
       ))}
 
-      {/* ── 5. Clients grid ── */}
+      {/* ── 5. Extended About (prose with inline Brier accents) ── */}
+      <ExtendedAbout />
+
+      {/* ── 6. Clients grid ── */}
       <Brands />
 
       {/* ── 6. Contact / washing-label footer ── */}

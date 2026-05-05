@@ -144,7 +144,7 @@ export function About() {
           display:        "flex",
           flexDirection:  "column",
           justifyContent: "center",
-          padding:        "clamp(8rem, 22vh, 16rem) clamp(1.5rem, 5vw, 5rem) clamp(6rem, 15vh, 10rem)",
+          padding:        "clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem) clamp(2rem, 5vh, 4rem)",
         }}
       >
         <div style={{ maxWidth: "min(1280px, 96vw)", margin: "0 auto", width: "100%" }}>
@@ -172,7 +172,7 @@ export function About() {
             ref={bodyRef}
             style={{
               fontFamily:    FONT_MONA,
-              fontSize:      "clamp(1.35rem, 3.4vw, 4.5rem)",
+              fontSize:      "clamp(1rem, 2.2vw, 2.8rem)",
               fontWeight:    800,
               lineHeight:    1.12,
               letterSpacing: "0.01em",

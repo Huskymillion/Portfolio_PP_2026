@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
@@ -15,26 +16,68 @@ const BRANDS = [
   "stadt zürich", "tkmaxx", "westwing", "woz", "xxxlutz", "yfood",
 ];
 
+function useIsDesktop() {
+  const [is, setIs] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIs(mq.matches);
+    const h = (e: MediaQueryListEvent) => setIs(e.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, []);
+  return is;
+}
+
+function BrandName({ name, index }: { name: string; index: number }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.span
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      animate={{ color: hovered ? "#0a0a0a" : "#888" }}
+      transition={{ duration: 0.12 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      style={{
+        fontFamily:    FONT_MONA,
+        fontSize:      "clamp(0.85rem, 1.1vw, 1.05rem)",
+        fontWeight:    450,
+        letterSpacing: "-0.01em",
+        cursor:        "default",
+        display:       "inline",
+        transition:    "color 0.12s ease",
+      }}
+    >
+      {name}
+    </motion.span>
+  );
+}
+
 export function Brands() {
+  const isDesktop = useIsDesktop();
+
   return (
     <section
       style={{
-        background: "#fff",
+        background: "#fafafa",
         borderTop:  "1px solid rgba(0,0,0,0.08)",
         padding:    "clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)",
       }}
     >
-      <div style={{ maxWidth: "min(1280px, 96vw)", margin: "0 auto" }}>
+      <div
+        style={{
+          maxWidth:    isDesktop ? "55%" : "100%",
+          marginRight: isDesktop ? "auto" : undefined,
+        }}
+      >
 
-        {/* Label */}
+        {/* Header */}
         <div
           style={{
-            display:        "flex",
-            alignItems:     "baseline",
-            justifyContent: "space-between",
-            marginBottom:   "clamp(2rem, 5vh, 4rem)",
-            paddingBottom:  "1rem",
-            borderBottom:   "1px solid rgba(0,0,0,0.1)",
+            marginBottom:  "clamp(2rem, 5vh, 4rem)",
+            paddingBottom: "1rem",
+            borderBottom:  "1px solid rgba(0,0,0,0.12)",
           }}
         >
           <span
@@ -50,55 +93,30 @@ export function Brands() {
           >
             clients
           </span>
-          <span
-            style={{
-              fontFamily:    FONT_MONA,
-              fontSize:      "0.62rem",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color:         "#bbb",
-            }}
-          >
-            {BRANDS.length} brands
-          </span>
         </div>
 
-        {/* Grid */}
-        <div
-          style={{
-            display:             "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap:                 0,
-          }}
-        >
+        {/* Inline flow with middot separators */}
+        <p style={{ margin: 0, lineHeight: 2 }}>
           {BRANDS.map((brand, i) => (
-            <motion.div
-              key={brand}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.3, delay: (i % 5) * 0.04 }}
-              style={{
-                borderTop:   "1px solid rgba(0,0,0,0.08)",
-                padding:     "0.75rem 0 0.75rem",
-                paddingRight: "1rem",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily:    FONT_MONA,
-                  fontSize:      "clamp(0.7rem, 0.95vw, 0.88rem)",
-                  fontWeight:    500,
-                  color:         "#0a0a0a",
-                  letterSpacing: "-0.01em",
-                  display:       "block",
-                }}
-              >
-                {brand}
-              </span>
-            </motion.div>
+            <span key={brand}>
+              <BrandName name={brand} index={i} />
+              {i < BRANDS.length - 1 && (
+                <span
+                  aria-hidden
+                  style={{
+                    fontFamily:  FONT_MONA,
+                    fontSize:    "clamp(0.85rem, 1.1vw, 1.05rem)",
+                    color:       "#ccc",
+                    padding:     "0 0.45em",
+                    userSelect:  "none",
+                  }}
+                >
+                  ·
+                </span>
+              )}
+            </span>
           ))}
-        </div>
+        </p>
 
       </div>
     </section>

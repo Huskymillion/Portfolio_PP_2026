@@ -8,7 +8,8 @@ accent: "#0b3d91"
 layout: video16x9
 hasTimeline: true
 services: video + photography + motion + edit
-description: Video, concept, motion and photography for the Kantonspolizei Bern.
+tagline: serving and protecting the canton
+description: Photography, video and motion production for the Cantonal Police of Bern — balancing authority with approachability.
 tags:
   - video
   - photography
