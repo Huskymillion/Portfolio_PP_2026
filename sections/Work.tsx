@@ -408,7 +408,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
       onClick={togglePlay}
       onMouseMove={showControls}
       onMouseLeave={() => { setCtrlVis(false); if (idleRef.current) clearTimeout(idleRef.current); }}
-      style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: project.accent, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+      style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "#000000", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
     >
       <video
         ref={videoRef}
@@ -497,11 +497,12 @@ function SocialCard({
 }) {
   const videoRef  = useRef<HTMLVideoElement>(null);
   const isHovered = hoveredIndex === index;
-  const [muted, setMuted] = useState(false);
+  const [muted,   setMuted]   = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   /* Pause when the grid section leaves the viewport */
   useEffect(() => {
-    if (forcePause) videoRef.current?.pause();
+    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
   }, [forcePause]);
 
   const centre   = (CARD_COUNT - 1) / 2;
@@ -515,11 +516,24 @@ function SocialCard({
     if (on) {
       if (videoRef.current) {
         videoRef.current.muted  = muted;
-        videoRef.current.volume = 0.7; // normalised level for manually-played videos
+        videoRef.current.volume = 0.7;
         videoRef.current.play().catch(() => {});
+        setPlaying(true);
       }
     } else {
       videoRef.current?.pause();
+      setPlaying(false);
+    }
+  };
+
+  const handleClick = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play().catch(() => {});
+      setPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setPlaying(false);
     }
   };
 
@@ -538,6 +552,7 @@ function SocialCard({
     <motion.div
       onHoverStart={() => handleHover(true)}
       onHoverEnd={() => handleHover(false)}
+      onClick={handleClick}
       animate={{
         x:       offset * cardSpacing,
         rotate:  isHovered ? 0 : rotation,
@@ -571,15 +586,22 @@ function SocialCard({
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
       />
 
-      {/* Play indicator — bare triangle, 65% → 100% on hover */}
+      {/* Play / Pause indicator */}
       <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.65 }}
+        animate={{ opacity: playing ? 0.9 : (isHovered ? 1 : 0.65) }}
         transition={{ duration: 0.22 }}
         style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, pointerEvents: "none" }}
       >
-        <svg width="14" height="16" viewBox="0 0 12 14" fill="none" aria-label="Play">
-          <polygon points="1,1 11,7 1,13" fill="#fff" />
-        </svg>
+        {playing ? (
+          <svg width="14" height="16" viewBox="0 0 12 14" fill="none" aria-label="Pause">
+            <rect x="1" y="1" width="3.5" height="12" rx="0.5" fill="#fff"/>
+            <rect x="7.5" y="1" width="3.5" height="12" rx="0.5" fill="#fff"/>
+          </svg>
+        ) : (
+          <svg width="14" height="16" viewBox="0 0 12 14" fill="none" aria-label="Play">
+            <polygon points="1,1 11,7 1,13" fill="#fff" />
+          </svg>
+        )}
       </motion.div>
 
       {/* Bottom gradient for label legibility */}
@@ -914,14 +936,14 @@ export function CaseStudy({ project }: { project: Project }) {
         </div>
       </motion.div>
 
-      {/* Block A — Horizontal timeline (always after the header block) */}
-      {hasTimeline && <HorizontalTimeline project={project} />}
-
-      {/* Block B — Social grid for dual-layout projects (grid9x16 + timeline, e.g. personal).
-          Renders after the timeline so the section order is: header → panels → cards. */}
+      {/* Block B — Social grid for dual-layout projects (grid9x16 + timeline).
+          Renders before the timeline so the section order is: header → cards → panels. */}
       {project.layout === "grid9x16" && hasTimeline && (project.gridCount ?? 1) > 0 && (
         <SocialGrid project={project} />
       )}
+
+      {/* Block A — Horizontal timeline (after social grid for dual-layout projects) */}
+      {hasTimeline && <HorizontalTimeline project={project} />}
     </section>
   );
 }
