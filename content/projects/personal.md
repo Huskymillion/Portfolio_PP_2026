@@ -8,6 +8,6 @@ accent: "#1a1a2e"
 layout: video16x9
 hasTimeline: true
 services: video, photography, edit
-featured: false
+featured: true
 published: true
 ---
