@@ -154,12 +154,13 @@ export function About() {
             <h2
               style={{
                 fontFamily:    FONT_BRIER,
-                fontSize:      "clamp(2rem, 5vw, 6rem)",
+                fontSize:      "clamp(1rem, 4.8vw, 7rem)",
                 fontWeight:    900,
                 lineHeight:    1,
                 letterSpacing: "-0.02em",
                 color:         ACCENT,
                 textTransform: "uppercase",
+                whiteSpace:    "nowrap",
                 margin:        0,
               }}
             >
@@ -172,7 +173,7 @@ export function About() {
             ref={bodyRef}
             style={{
               fontFamily:    FONT_MONA,
-              fontSize:      "clamp(1rem, 2.2vw, 2.8rem)",
+              fontSize:      "clamp(1.5rem, 3.5vw, 4.5rem)",
               fontWeight:    800,
               lineHeight:    1.12,
               letterSpacing: "0.01em",

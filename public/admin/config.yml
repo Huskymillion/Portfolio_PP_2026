@@ -1,7 +1,9 @@
 backend:
   name: github
-  repo: Huskymillion/Portfolio_PP_2026  # ← fill in before deploying
+  repo: Huskymillion/Portfolio_PP_2026
   branch: main
+  base_url: https://huskymillion.com
+  auth_endpoint: api/auth
 
 media_folder: public/uploads
 public_folder: /uploads

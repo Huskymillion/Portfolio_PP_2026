@@ -773,12 +773,27 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                 overflow:        "hidden",
               }}
             >
-              {/* Panel image — hides itself on 404, reveals accent bg fallback */}
+              {/*
+                Panel image — hides itself on 404, reveals accent bg fallback.
+                PROJECT 06 (kapo bern): images are 1080×1920 portrait (9:16) inside
+                landscape frames → object-fit: contain to show the full frame.
+                OPTION A (Photoshop): re-export images to match the panel frame
+                dimensions: approx 1860×1116px (62vw×62vh at 1920×900) as JPEG 85%.
+                Use File → Export → Export As, fit to canvas, fill gaps with black/dark bg.
+              */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
+                style={{
+                  position:  "absolute",
+                  inset:     0,
+                  width:     "100%",
+                  height:    "100%",
+                  objectFit: project.id === "06" ? "contain" : "cover",
+                  background: project.id === "06" ? "#0a0a0a" : "transparent",
+                  zIndex:    0,
+                }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
 
@@ -921,7 +936,9 @@ export function CaseStudy({ project }: { project: Project }) {
         {/* Content fills remaining viewport height */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
           {project.layout === "video16x9" && (
-            <FullscreenVideo project={project} />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: "clamp(1rem, 2.5vh, 2rem)", background: "#fafafa" }}>
+              <FullscreenVideo project={project} />
+            </div>
           )}
           {project.layout === "grid9x16" && (
             <SocialGrid project={project} />
