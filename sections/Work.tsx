@@ -281,7 +281,7 @@ export function WorkOverview() {
           position:      "sticky",
           top:           0,
           height:        "100vh",
-          background:    "#0a0a0a",
+          background:    "#000000",
           overflow:      "hidden",
           display:       "flex",
           flexDirection: "column",
@@ -738,7 +738,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
 
   return (
     <div ref={wrapperRef} style={{ position: "relative", minHeight: "300vh" }}>
-      <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden", background: "#0a0a0a" }}>
+      <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden", background: "#000000" }}>
 
         {/* Scroll hint */}
         <div style={{
@@ -848,7 +848,7 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
 export function CaseStudy({ project }: { project: Project }) {
   const hasTimeline = project.extra === "timeline";
   const dark        = !!project.darkSection;
-  const sectionBg   = dark ? "#0a0a0a" : "#fafafa";
+  const sectionBg   = dark ? "#000000" : "#fafafa";
   const textPrimary = dark ? "#fafafa"  : "#0a0a0a";
   const textMuted   = dark ? "rgba(255,255,255,0.5)"  : "#555";
   const textSubtle  = dark ? "rgba(255,255,255,0.35)" : "#777";
@@ -905,14 +905,23 @@ export function CaseStudy({ project }: { project: Project }) {
               <FullscreenVideo project={project} />
             </div>
           )}
-          {project.layout === "grid9x16" && (project.gridCount ?? 1) > 0 && (
+          {/* Pure grid layouts (no timeline): social grid renders here inline.
+              Dual-layout (grid + timeline): social grid renders after the timeline below,
+              so the order is: header → timeline (Block A) → social grid (Block B). */}
+          {project.layout === "grid9x16" && !hasTimeline && (project.gridCount ?? 1) > 0 && (
             <SocialGrid project={project} />
           )}
         </div>
       </motion.div>
 
-      {/* Horizontal timeline — break out of overflow:hidden parent */}
+      {/* Block A — Horizontal timeline (always after the header block) */}
       {hasTimeline && <HorizontalTimeline project={project} />}
+
+      {/* Block B — Social grid for dual-layout projects (grid9x16 + timeline, e.g. personal).
+          Renders after the timeline so the section order is: header → panels → cards. */}
+      {project.layout === "grid9x16" && hasTimeline && (project.gridCount ?? 1) > 0 && (
+        <SocialGrid project={project} />
+      )}
     </section>
   );
 }

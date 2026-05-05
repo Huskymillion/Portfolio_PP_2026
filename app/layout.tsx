@@ -20,7 +20,11 @@ export const metadata: Metadata = {
   title: "Servus + Hello",
   description: "",
   icons: {
-    icon:    "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple:   "/favicon.svg",
     shortcut: "/favicon.ico",
   },
 };

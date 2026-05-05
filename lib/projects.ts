@@ -95,7 +95,7 @@ export const PROJECTS: Project[] = [
     layout: "grid9x16", extra: "timeline", accent: "#2c2c2c",
     tagline:     "analog moments + personal work",
     description: "A collection of analog photography and personal creative projects — work made for the love of it.",
-    panelCount:  0,  // increase when panel images are present
-    gridCount:   0,  // increase when social card videos are present
+    panelCount:  5,  // panel-01…panel-05 in public/projects/09/
+    gridCount:   5,  // grid-01…grid-05.mp4 in public/projects/09/
   },
 ];
