@@ -47,9 +47,10 @@ export const PROJECTS: Project[] = [
   {
     id: "05", slug: "schweizer-paraplegiker-stiftung", name: "schweizer paraplegiker stiftung", type: "healthcare",
     services: "video + concept + motion + edit",
-    layout: "video16x9", accent: "#533483",
+    layout: "video16x9", extra: "timeline", accent: "#533483",
     tagline:     "support. dignity. independence.",
     description: "Sensitive and human-centred video storytelling for one of Switzerland's most important healthcare foundations.",
+    panelCount:  4,
   },
   {
     id: "06", slug: "kapo-bern", name: "kapo bern", type: "cantonal police",
@@ -65,7 +66,7 @@ export const PROJECTS: Project[] = [
     layout: "video16x9", extra: "timeline", accent: "#1b4332",
     tagline:     "health care, humanised",
     description: "Concept and photography work for KFH, translating a complex healthcare brand into warm, accessible visual communication.",
-    panelCount:  0,
+    panelCount:  4,
   },
   {
     id: "08", slug: "mawave", name: "mawave", type: "social first agency",

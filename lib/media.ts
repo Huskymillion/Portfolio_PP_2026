@@ -56,6 +56,7 @@ const DRIVE_IDS: Record<string, DriveMap> = {
     "hero":   "1s--altezqumcSlHGUB-OSu6gsH_arIcD",
     "poster": "",
     "thumb":  "",
+    "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "",
   },
   "06": { // kapo bern
     "hero":        "",
@@ -81,7 +82,8 @@ function driveImage(id: string) {
 }
 
 function driveVideo(id: string) {
-  return `https://drive.google.com/uc?export=download&id=${id}`;
+  // confirm=t bypasses Google's virus-scan redirect page, which <video> cannot follow
+  return `https://drive.google.com/uc?export=download&confirm=t&id=${id}`;
 }
 
 /** Image URL — Drive if ID exists, else local public path. */

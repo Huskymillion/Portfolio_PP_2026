@@ -50,9 +50,6 @@ function Thumbnail({ project, visible, x, y }: {
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-          <span style={{ position: "relative", fontFamily: FONT_BRIER, fontSize: "0.7rem", color: "#fff", opacity: 0.6, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            {project.name}
-          </span>
         </motion.div>
       )}
     </AnimatePresence>
@@ -405,7 +402,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
       onClick={togglePlay}
       onMouseMove={showControls}
       onMouseLeave={() => { setCtrlVis(false); if (idleRef.current) clearTimeout(idleRef.current); }}
-      style={{ position: "relative", flex: 1, width: "100%", background: project.accent, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "40vh", cursor: "pointer" }}
+      style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: project.accent, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
     >
       <video
         ref={videoRef}
@@ -413,7 +410,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
         poster={imageUrl(project.id, "poster")}
         muted loop playsInline preload="metadata"
         onCanPlay={() => setReady(true)}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
       />
       <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 1.2vw, 1rem)", color: "#fff", opacity: ready ? 0 : 0.35, textTransform: "uppercase", letterSpacing: "0.08em", transition: "opacity 0.5s ease", pointerEvents: "none" }}>
         {project.name}
@@ -559,7 +556,7 @@ function SocialCard({
         poster={imageUrl(project.id, `grid-${n}-thumb`)}
         loop playsInline preload="metadata"
         muted={muted}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
       />
 
       {/* Play indicator — bare triangle, 65% → 100% on hover */}
@@ -670,10 +667,6 @@ const LANDSCAPE_SIZES = [
 function getPanels(project: Project) {
   const count = project.panelCount ?? 5;
   if (count === 0) return [];
-  if (project.id === "06") {
-    // Kapo bern: 1080×1920 portrait images → portrait frames
-    return Array.from({ length: count }, () => ({ w: "calc(65vh * 9 / 16)", h: "65vh", portrait: true }));
-  }
   return LANDSCAPE_SIZES.slice(0, count).map((s) => ({ ...s, portrait: false }));
 }
 
@@ -790,7 +783,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                   inset:     0,
                   width:     "100%",
                   height:    "100%",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   zIndex:    0,
                 }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
@@ -935,7 +928,7 @@ export function CaseStudy({ project }: { project: Project }) {
         {/* Content fills remaining viewport height */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
           {project.layout === "video16x9" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: "clamp(3rem, 6vh, 5rem)", background: "#fafafa" }}>
+            <div style={{ paddingTop: "clamp(3rem, 6vh, 5rem)", paddingBottom: "clamp(1.5rem, 3vh, 2.5rem)", background: "#fafafa" }}>
               <FullscreenVideo project={project} />
             </div>
           )}
