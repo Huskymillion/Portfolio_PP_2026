@@ -381,6 +381,10 @@ export function FullscreenVideo({ project }: { project: Project }) {
     idleRef.current = setTimeout(() => setCtrlVis(false), 2500);
   }, []);
 
+  /* Hero video is always muted for autoplay — ensure volume=0 on mount so
+     browsers that gate autoplay on both muted+volume respect it. */
+  useEffect(() => { if (videoRef.current) videoRef.current.volume = 0; }, []);
+
   useEffect(() => () => { if (idleRef.current) clearTimeout(idleRef.current); }, []);
 
   const togglePlay = () => {
@@ -392,8 +396,10 @@ export function FullscreenVideo({ project }: { project: Project }) {
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setMuted(videoRef.current.muted);
+    const nowMuted = !videoRef.current.muted;
+    videoRef.current.muted = nowMuted;
+    if (!nowMuted) videoRef.current.volume = 0.7; // restore audible level when unmuting
+    setMuted(nowMuted);
   };
 
   return (
@@ -507,7 +513,11 @@ function SocialCard({
   const handleHover = (on: boolean) => {
     setHoveredIndex(on ? index : null);
     if (on) {
-      if (videoRef.current) { videoRef.current.muted = muted; videoRef.current.play().catch(() => {}); }
+      if (videoRef.current) {
+        videoRef.current.muted  = muted;
+        videoRef.current.volume = 0.7; // normalised level for manually-played videos
+        videoRef.current.play().catch(() => {});
+      }
     } else {
       videoRef.current?.pause();
     }
@@ -516,8 +526,10 @@ function SocialCard({
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setMuted(videoRef.current.muted);
+    const nowMuted = !videoRef.current.muted;
+    videoRef.current.muted = nowMuted;
+    if (!nowMuted) videoRef.current.volume = 0.7;
+    setMuted(nowMuted);
   };
 
   const n = String(index + 1).padStart(2, "0");
@@ -836,7 +848,7 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
 export function CaseStudy({ project }: { project: Project }) {
   const hasTimeline = project.extra === "timeline";
   const dark        = !!project.darkSection;
-  const sectionBg   = dark ? "#111111" : "#fafafa";
+  const sectionBg   = dark ? "#0a0a0a" : "#fafafa";
   const textPrimary = dark ? "#fafafa"  : "#0a0a0a";
   const textMuted   = dark ? "rgba(255,255,255,0.5)"  : "#555";
   const textSubtle  = dark ? "rgba(255,255,255,0.35)" : "#777";

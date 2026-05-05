@@ -66,7 +66,7 @@ export const PROJECTS: Project[] = [
   {
     id: "07", slug: "kfh", name: "kfh", type: "health care",
     services: "photography + concept",
-    layout: "video16x9", extra: "timeline", accent: "#111111",
+    layout: "video16x9", extra: "timeline", accent: "#0a0a0a",
     tagline:     "health care, humanised",
     description: "Concept and photography work for KFH, translating a complex healthcare brand into warm, accessible visual communication.",
     panelCount:  4,
@@ -80,12 +80,22 @@ export const PROJECTS: Project[] = [
     description: "As creative content producer, responsible for the full outbound visual representation and concept — translating brands into scroll-stopping social content.",
   },
   {
+    /*
+     * PERSONAL PROJECT — Media placement guide
+     * ─────────────────────────────────────────
+     * Panel images  → public/projects/09/panel-01.jpg, panel-02.jpg, …
+     * Social videos → public/projects/09/grid-01.mp4,  grid-02.mp4,  …
+     * Thumbnail     → public/projects/09/thumb.jpg
+     *
+     * After adding files: update panelCount / gridCount to the actual file count
+     * so the components render the right number of frames.
+     */
     id: "09", slug: "personal", name: "personal", type: "analog photos + private projects",
     services: "photography + analog + personal",
     layout: "grid9x16", extra: "timeline", accent: "#2c2c2c",
     tagline:     "analog moments + personal work",
     description: "A collection of analog photography and personal creative projects — work made for the love of it.",
-    panelCount:  0,  // upload panel-*.jpg to /public/projects/09/ to enable timeline
-    gridCount:   0,  // upload grid-*.mp4 to /public/projects/09/ to enable social cards
+    panelCount:  0,  // increase when panel images are present
+    gridCount:   0,  // increase when social card videos are present
   },
 ];
