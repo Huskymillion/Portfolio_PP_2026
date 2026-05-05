@@ -147,7 +147,8 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
 
 /* ─── Part A: Work Index ────────────────────────── */
 
-export function WorkIndex() {
+export function WorkIndex({ projects: propProjects }: { projects?: Project[] } = {}) {
+  const projects = propProjects ?? PROJECTS;
   const [hovered, setHovered]  = useState<Project | null>(null);
   const [cursorPos, setCursor] = useState({ x: 0, y: 0 });
 
@@ -184,7 +185,7 @@ export function WorkIndex() {
 
         {/* Per-row intersection-triggered fade — each row fires its own observer */}
         <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
-          {PROJECTS.map((p) => (
+          {projects.map((p) => (
             <motion.div
               key={p.id}
               initial={{ opacity: 0, y: 14 }}
@@ -466,10 +467,11 @@ function useCardDims() {
   useEffect(() => {
     function calc() {
       const vw = window.innerWidth;
-      const w  = vw >= 1024
-        ? Math.min(Math.round(vw * 0.21), 320)
-        : 180;
-      setDims({ w, h: Math.round(w * 16 / 9), spacing: Math.round(w * 0.72) });
+      if (vw < 1024) { setDims({ w: 180, h: 320, spacing: 130 }); return; }
+      // Scale card height to 55 % of viewport height — looks right on every monitor size
+      const h = Math.round(Math.min(Math.max(window.innerHeight * 0.55, 280), 820));
+      const w = Math.round(h * 9 / 16);
+      setDims({ w, h, spacing: Math.round(w * 0.72) });
     }
     calc();
     window.addEventListener("resize", calc);
@@ -657,19 +659,26 @@ export function SocialGrid({ project }: { project: Project }) {
 
 /* ─── Horizontal Image Timeline ──────────────────── */
 
-/*
- * Mixed-format panels — widths intentionally varied so the gallery feels
- * like a curated editorial spread rather than a uniform grid.
- */
-const PANELS = [
+const LANDSCAPE_SIZES = [
   { w: "62vw", h: "62vh" },
   { w: "36vw", h: "74vh" },
   { w: "50vw", h: "58vh" },
   { w: "38vw", h: "70vh" },
   { w: "58vw", h: "60vh" },
-] as const;
+];
+
+function getPanels(project: Project) {
+  const count = project.panelCount ?? 5;
+  if (count === 0) return [];
+  if (project.id === "06") {
+    // Kapo bern: 1080×1920 portrait images → portrait frames
+    return Array.from({ length: count }, () => ({ w: "calc(65vh * 9 / 16)", h: "65vh", portrait: true }));
+  }
+  return LANDSCAPE_SIZES.slice(0, count).map((s) => ({ ...s, portrait: false }));
+}
 
 export function HorizontalTimeline({ project }: { project: Project }) {
+  const panels = getPanels(project);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const xMotion    = useMotionValue(0);
@@ -680,6 +689,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
   });
 
   useEffect(() => {
+    if (panels.length === 0) return;
     /* Returns how many px the gallery must travel until the last panel's
        right edge aligns with the viewport right edge (excludes paddingRight). */
     const getDistance = () => {
@@ -717,13 +727,11 @@ export function HorizontalTimeline({ project }: { project: Project }) {
       unsubscribe();
       window.removeEventListener("resize", sync);
     };
-  }, [scrollYProgress, xMotion]);
+  }, [scrollYProgress, xMotion, panels.length]);
+
+  if (panels.length === 0) return null;
 
   return (
-    /*
-     * Wrapper height is set dynamically by the effect above.
-     * The 300vh fallback keeps sticky working on first paint.
-     */
     <div ref={wrapperRef} style={{ position: "relative", minHeight: "300vh" }}>
       <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden", background: "#0a0a0a" }}>
 
@@ -755,7 +763,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
             willChange: "transform",
           }}
         >
-          {PANELS.map((panel, i) => (
+          {panels.map((panel, i) => (
             <div
               key={i}
               style={{
@@ -773,14 +781,6 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                 overflow:        "hidden",
               }}
             >
-              {/*
-                Panel image — hides itself on 404, reveals accent bg fallback.
-                PROJECT 06 (kapo bern): images are 1080×1920 portrait (9:16) inside
-                landscape frames → object-fit: contain to show the full frame.
-                OPTION A (Photoshop): re-export images to match the panel frame
-                dimensions: approx 1860×1116px (62vw×62vh at 1920×900) as JPEG 85%.
-                Use File → Export → Export As, fit to canvas, fill gaps with black/dark bg.
-              */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
@@ -790,8 +790,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                   inset:     0,
                   width:     "100%",
                   height:    "100%",
-                  objectFit: project.id === "06" ? "contain" : "cover",
-                  background: project.id === "06" ? "#0a0a0a" : "transparent",
+                  objectFit: "cover",
                   zIndex:    0,
                 }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
@@ -819,7 +818,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                   color:         "rgba(255,255,255,0.5)",
                   letterSpacing: "-0.02em",
                 }}>
-                  {String(i + 1).padStart(2, "0")} / {String(PANELS.length).padStart(2, "0")}
+                  {String(i + 1).padStart(2, "0")} / {String(panels.length).padStart(2, "0")}
                 </div>
               </div>
             </div>
@@ -936,7 +935,7 @@ export function CaseStudy({ project }: { project: Project }) {
         {/* Content fills remaining viewport height */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
           {project.layout === "video16x9" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: "clamp(1rem, 2.5vh, 2rem)", background: "#fafafa" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: "clamp(3rem, 6vh, 5rem)", background: "#fafafa" }}>
               <FullscreenVideo project={project} />
             </div>
           )}

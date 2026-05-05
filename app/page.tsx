@@ -4,21 +4,13 @@ import { WorkIndex, CaseStudy }  from "@/sections/Work";
 import { ExtendedAbout }         from "@/sections/ExtendedAbout";
 import { Brands }                from "@/sections/Brands";
 import { Contact }               from "@/sections/Contact";
-import { PROJECTS }              from "@/lib/projects";
+import { getProjectsFromCMS }    from "@/lib/cms-projects";
 
-export default function Home() {
+export default async function Home() {
+  const projects = await getProjectsFromCMS();
+
   return (
     <main>
-      {/*
-       * Sequential DOM flow — no z-index stacking, no negative margins.
-       *
-       * Scroll timeline:
-       *   0 – 60vh    Hero static (scramble animating)
-       *   60 – 170vh  Hero panels split apart
-       *   170 – 200vh Split complete; About enters from below
-       *   200vh +     About in normal flow → Work Index → Case Studies
-       */}
-
       {/* ── 1. Hero (200vh wrapper, splits on scroll) ── */}
       <Hero />
 
@@ -26,10 +18,10 @@ export default function Home() {
       <About />
 
       {/* ── 3. Work Index (rows stagger in on scroll) ── */}
-      <WorkIndex />
+      <WorkIndex projects={projects} />
 
       {/* ── 4. Case Studies (100vh each) ── */}
-      {PROJECTS.map((p) => (
+      {projects.map((p) => (
         <CaseStudy key={p.id} project={p} />
       ))}
 
@@ -39,7 +31,7 @@ export default function Home() {
       {/* ── 6. Clients grid ── */}
       <Brands />
 
-      {/* ── 6. Contact / washing-label footer ── */}
+      {/* ── 7. Contact / washing-label footer ── */}
       <Contact />
     </main>
   );
