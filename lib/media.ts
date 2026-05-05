@@ -75,6 +75,12 @@ const DRIVE_IDS: Record<string, DriveMap> = {
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
   },
+  "09": { // personal
+    "thumb":       "",
+    "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "", "panel-05": "",
+    "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
+    "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
+  },
 };
 
 function driveImage(id: string) {

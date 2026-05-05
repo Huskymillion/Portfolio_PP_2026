@@ -12,6 +12,8 @@ export interface Project {
   tagline?:     string;
   description?: string;
   panelCount?:  number;
+  gridCount?:   number;   // social card count; omit = default 5; 0 = don't render
+  darkSection?: boolean;  // true = section bg #111, text inverted to white
 }
 
 export const PROJECTS: Project[] = [
@@ -51,6 +53,7 @@ export const PROJECTS: Project[] = [
     tagline:     "support. dignity. independence.",
     description: "Sensitive and human-centred video storytelling for one of Switzerland's most important healthcare foundations.",
     panelCount:  4,
+    darkSection: true,
   },
   {
     id: "06", slug: "kapo-bern", name: "kapo bern", type: "cantonal police",
@@ -63,10 +66,11 @@ export const PROJECTS: Project[] = [
   {
     id: "07", slug: "kfh", name: "kfh", type: "health care",
     services: "photography + concept",
-    layout: "video16x9", extra: "timeline", accent: "#1b4332",
+    layout: "video16x9", extra: "timeline", accent: "#111111",
     tagline:     "health care, humanised",
     description: "Concept and photography work for KFH, translating a complex healthcare brand into warm, accessible visual communication.",
     panelCount:  4,
+    darkSection: true,
   },
   {
     id: "08", slug: "mawave", name: "mawave", type: "social first agency",
@@ -74,5 +78,14 @@ export const PROJECTS: Project[] = [
     layout: "grid9x16", accent: "#3d0000",
     tagline:     "we translate brands to social media",
     description: "As creative content producer, responsible for the full outbound visual representation and concept — translating brands into scroll-stopping social content.",
+  },
+  {
+    id: "09", slug: "personal", name: "personal", type: "analog photos + private projects",
+    services: "photography + analog + personal",
+    layout: "grid9x16", extra: "timeline", accent: "#2c2c2c",
+    tagline:     "analog moments + personal work",
+    description: "A collection of analog photography and personal creative projects — work made for the love of it.",
+    panelCount:  0,  // upload panel-*.jpg to /public/projects/09/ to enable timeline
+    gridCount:   0,  // upload grid-*.mp4 to /public/projects/09/ to enable social cards
   },
 ];

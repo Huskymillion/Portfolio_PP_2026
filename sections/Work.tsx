@@ -760,60 +760,21 @@ export function HorizontalTimeline({ project }: { project: Project }) {
             <div
               key={i}
               style={{
-                flexShrink:      0,
-                width:           panel.w,
-                height:          panel.h,
-                position:        "relative",
-                background:      project.accent,
-                filter:          `brightness(${0.55 + i * 0.09})`,
-                borderRadius:    2,
-                display:         "flex",
-                flexDirection:   "column",
-                justifyContent:  "space-between",
-                padding:         "clamp(1.25rem, 2.5vh, 2rem) clamp(1.25rem, 2vw, 2rem)",
-                overflow:        "hidden",
+                flexShrink: 0,
+                width:      panel.w,
+                height:     panel.h,
+                position:   "relative",
+                borderRadius: 2,
+                overflow:   "hidden",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
-                style={{
-                  position:  "absolute",
-                  inset:     0,
-                  width:     "100%",
-                  height:    "100%",
-                  objectFit: "contain",
-                  zIndex:    0,
-                }}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
-
-              {/* Top-left: project name */}
-              <div style={{
-                position:      "relative",
-                zIndex:        1,
-                fontFamily:    FONT_BRIER,
-                fontSize:      "clamp(0.65rem, 1.1vw, 0.9rem)",
-                fontWeight:    900,
-                color:         "rgba(255,255,255,0.75)",
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-              }}>
-                {project.name}
-              </div>
-
-              {/* Bottom: counter only */}
-              <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "flex-end", alignItems: "flex-end" }}>
-                <div style={{
-                  fontFamily:    FONT_BRIER,
-                  fontSize:      "clamp(0.75rem, 1.5vw, 1.2rem)",
-                  color:         "rgba(255,255,255,0.5)",
-                  letterSpacing: "-0.02em",
-                }}>
-                  {String(i + 1).padStart(2, "0")} / {String(panels.length).padStart(2, "0")}
-                </div>
-              </div>
             </div>
           ))}
         </motion.div>
@@ -824,16 +785,21 @@ export function HorizontalTimeline({ project }: { project: Project }) {
 
 /* ─── Case Study meta strip ─────────────────────── */
 
-function CaseStudyMeta({ project }: { project: Project }) {
+function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
+  project:     Project;
+  textPrimary: string;
+  textMuted:   string;
+  textSubtle:  string;
+}) {
   return (
     <div
       style={{
-        display:       "flex",
-        alignItems:    "flex-end",
-        justifyContent:"space-between",
-        gap:           "2rem",
-        padding:       "clamp(2rem, 4vh, 3.5rem) clamp(1.5rem, 5vw, 5rem) clamp(1.25rem, 2.5vh, 2rem)",
-        flexShrink:    0,
+        display:        "flex",
+        alignItems:     "flex-end",
+        justifyContent: "space-between",
+        gap:            "2rem",
+        padding:        "clamp(2rem, 4vh, 3.5rem) clamp(1.5rem, 5vw, 5rem) clamp(1.25rem, 2.5vh, 2rem)",
+        flexShrink:     0,
       }}
     >
       {/* Left: number + name + tagline */}
@@ -842,11 +808,11 @@ function CaseStudyMeta({ project }: { project: Project }) {
           {project.id}
         </span>
         <div>
-          <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: "#0a0a0a" }}>
+          <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: textPrimary }}>
             {project.name}
           </div>
           {project.tagline && (
-            <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.72rem, 1vw, 0.92rem)", fontStyle: "italic", color: "#777", marginTop: "0.35em", letterSpacing: "0.01em" }}>
+            <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.72rem, 1vw, 0.92rem)", fontStyle: "italic", color: textSubtle, marginTop: "0.35em", letterSpacing: "0.01em" }}>
               {project.tagline}
             </div>
           )}
@@ -854,10 +820,10 @@ function CaseStudyMeta({ project }: { project: Project }) {
       </div>
       {/* Right: type + services */}
       <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.6rem, 0.85vw, 0.78rem)", color: "#555", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.6rem, 0.85vw, 0.78rem)", color: textMuted, letterSpacing: "0.04em", textTransform: "uppercase" }}>
           {project.type}
         </div>
-        <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.55rem, 0.75vw, 0.7rem)", color: "#555", marginTop: "0.2rem", letterSpacing: "0.02em" }}>
+        <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.55rem, 0.75vw, 0.7rem)", color: textMuted, marginTop: "0.2rem", letterSpacing: "0.02em" }}>
           {project.services}
         </div>
       </div>
@@ -869,12 +835,17 @@ function CaseStudyMeta({ project }: { project: Project }) {
 
 export function CaseStudy({ project }: { project: Project }) {
   const hasTimeline = project.extra === "timeline";
+  const dark        = !!project.darkSection;
+  const sectionBg   = dark ? "#111111" : "#fafafa";
+  const textPrimary = dark ? "#fafafa"  : "#0a0a0a";
+  const textMuted   = dark ? "rgba(255,255,255,0.5)"  : "#555";
+  const textSubtle  = dark ? "rgba(255,255,255,0.35)" : "#777";
 
   return (
     <section
       id={`case-${project.id}`}
       style={{
-        background: "#fafafa",
+        background: sectionBg,
         position:   "relative",
         minHeight:  "100vh",
         overflowX:  hasTimeline ? "clip" : (project.layout === "grid9x16" ? "clip" : "hidden"),
@@ -896,7 +867,7 @@ export function CaseStudy({ project }: { project: Project }) {
           flexDirection: "column",
         }}
       >
-        <CaseStudyMeta project={project} />
+        <CaseStudyMeta project={project} textPrimary={textPrimary} textMuted={textMuted} textSubtle={textSubtle} />
 
         {/* Description block — sits between header and media */}
         {project.description && (
@@ -905,21 +876,9 @@ export function CaseStudy({ project }: { project: Project }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              padding: "clamp(0.75rem, 2vh, 1.5rem) clamp(1.5rem, 5vw, 5rem)",
-            }}
+            style={{ padding: "clamp(0.75rem, 2vh, 1.5rem) clamp(1.5rem, 5vw, 5rem)" }}
           >
-            <p
-              style={{
-                fontFamily:  FONT_MONA,
-                fontSize:    "clamp(0.88rem, 1.1vw, 1rem)",
-                fontWeight:  400,
-                color:       "#555",
-                lineHeight:  1.7,
-                maxWidth:    "800px",
-                margin:      0,
-              }}
-            >
+            <p style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.88rem, 1.1vw, 1rem)", fontWeight: 400, color: textMuted, lineHeight: 1.7, maxWidth: "800px", margin: 0 }}>
               {project.description}
             </p>
           </motion.div>
@@ -928,11 +887,13 @@ export function CaseStudy({ project }: { project: Project }) {
         {/* Content fills remaining viewport height */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
           {project.layout === "video16x9" && (
-            <div style={{ paddingTop: "clamp(3rem, 6vh, 5rem)", paddingBottom: "clamp(1.5rem, 3vh, 2.5rem)", background: "#fafafa" }}>
+            /* No explicit background — section bg shows through. paddingBottom: 0 when
+               a timeline follows immediately to avoid a visible gap between the two blocks. */
+            <div style={{ paddingTop: "clamp(3rem, 6vh, 5rem)", paddingBottom: hasTimeline ? 0 : "clamp(1.5rem, 3vh, 2.5rem)" }}>
               <FullscreenVideo project={project} />
             </div>
           )}
-          {project.layout === "grid9x16" && (
+          {project.layout === "grid9x16" && (project.gridCount ?? 1) > 0 && (
             <SocialGrid project={project} />
           )}
         </div>

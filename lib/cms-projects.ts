@@ -13,6 +13,7 @@ const SLUG_TO_ID: Record<string, string> = {
   "kapo-bern":                    "06",
   "kfh":                          "07",
   "mawave":                       "08",
+  "personal":                     "09",
 };
 
 export async function getProjectsFromCMS(): Promise<Project[]> {
