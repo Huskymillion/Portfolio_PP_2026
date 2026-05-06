@@ -10,7 +10,7 @@ hasTimeline: true
 services: video + motion + concept + photography + edit
 tagline: zürich's creative agency for bold ideas
 description: Ongoing content production across video, motion and photography for
-  one of Zurich's most distinct creative studios.
+  the Zurich based creative agency.
 tags:
   - video
   - motion
