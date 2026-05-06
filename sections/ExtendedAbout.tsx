@@ -8,10 +8,10 @@ const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 
 const PARAGRAPHS = [
-  "Born into a family of photographers in the Allgäu, creativity was never a choice—it was my environment. From early portraiture to launching a sustainable streetwear label -köttur- in 2020, my work is driven by a constant need for visual experimentation.",
-  "While influenced by the raw energy of artists like -grif-, -1UP-, and the -100 Black Dolphins- collective, my core focus is advertising storytelling: where emotion meets sharp, reimagined narratives.",
-  "I value a meticulously brewed coffee, bavarian beer, fashion, skating, and skiing. I also have a habit of naming things—dogs, plants, or objects—based on how I -perceive- them.",
-  "My goal is direct: helping brands create genuine -impact- by translating their values across platforms and generations.",
+  "Born into a family of photographers in the Allgäu, creativity was never a choice, it was my environment. From early portraiture to launching a sustainable streetwear label -köttur- in 2020, my work is driven by a constant visual experimentation.",
+  "While influenced by the raw style of artists like -grif-, -1UP-, and the -100 Black Dolphins-, my core focus is advertising storytelling: where emotion meets sharp, reimagined narratives.",
+  "I value a meticulously brewed coffee, bavarian beer, fashion, skating, and skiing. I also have a habit of naming things: dogs, plants, or objects, based on how I -perceive- them.",
+  "My goal is to help brands create genuine -impact- by translating their stories.",
 ];
 
 function parseInline(text: string): React.ReactNode[] {
