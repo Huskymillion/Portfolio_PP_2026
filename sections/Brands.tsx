@@ -45,7 +45,8 @@ function BrandName({ name, index }: { name: string; index: number }) {
         fontWeight:    450,
         letterSpacing: "-0.01em",
         cursor:        "default",
-        display:       "inline",
+        display:       "inline-block",
+        whiteSpace:    "nowrap",
         transition:    "color 0.12s ease",
       }}
     >

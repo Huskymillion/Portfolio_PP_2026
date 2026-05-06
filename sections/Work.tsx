@@ -414,7 +414,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
         ref={videoRef}
         src={videoUrl(project.id, "hero")}
         poster={imageUrl(project.id, "poster")}
-        muted loop playsInline preload="metadata"
+        autoPlay muted loop playsInline preload="auto"
         onCanPlay={() => setReady(true)}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
       />
@@ -664,8 +664,8 @@ export function SocialGrid({ project }: { project: Project }) {
         display:        "flex",
         alignItems:     "center",
         justifyContent: "center",
-        paddingTop:     "clamp(2rem, 5vh, 4rem)",
-        paddingBottom:  cardW > 180 ? "0.75rem" : "clamp(2rem, 5vh, 4rem)",
+        paddingTop:     "clamp(0.5rem, 1vh, 1rem)",
+        paddingBottom:  cardW > 180 ? "0.75rem" : "clamp(1rem, 2vh, 2rem)",
         overflow:       "visible",
       }}
     >
@@ -698,10 +698,20 @@ const LANDSCAPE_SIZES = [
   { w: "58vw", h: "60vh" },
 ];
 
+// Kapo bern: second frame is featured — visibly larger than the rest
+const KAPO_SIZES = [
+  { w: "62vw", h: "62vh" },
+  { w: "48vw", h: "90vh" }, // ← enlarged second panel
+  { w: "50vw", h: "58vh" },
+  { w: "38vw", h: "70vh" },
+  { w: "58vw", h: "60vh" },
+];
+
 function getPanels(project: Project) {
   const count = project.panelCount ?? 5;
   if (count === 0) return [];
-  return LANDSCAPE_SIZES.slice(0, count).map((s) => ({ ...s, portrait: false }));
+  const sizes = project.slug === "kapo-bern" ? KAPO_SIZES : LANDSCAPE_SIZES;
+  return sizes.slice(0, count).map((s) => ({ ...s, portrait: false }));
 }
 
 export function HorizontalTimeline({ project }: { project: Project }) {
