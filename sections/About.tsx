@@ -147,7 +147,7 @@ export function About() {
           padding:        "clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem) clamp(2rem, 5vh, 4rem)",
         }}
       >
-        <div style={{ maxWidth: "min(1280px, 96vw)", margin: "0 auto", width: "100%" }}>
+        <div style={{ width: "100%" }}>
 
           {/* Headline */}
           <div style={{ marginBottom: "clamp(1.25rem, 3vh, 2.5rem)" }}>
@@ -173,7 +173,7 @@ export function About() {
             ref={bodyRef}
             style={{
               fontFamily:    FONT_MONA,
-              fontSize:      "clamp(1.5rem, 3.5vw, 4.5rem)",
+              fontSize:      "clamp(1.2rem, 4.2vw, 6rem)",
               fontWeight:    800,
               lineHeight:    1.12,
               letterSpacing: "0.01em",

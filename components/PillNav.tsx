@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Zap } from "lucide-react";
 import { useLenis } from "./SmoothScrollProvider";
@@ -12,9 +12,10 @@ const ITEMS = [
 ];
 
 export function PillNav() {
-  const lenis = useLenis();
-  const { scrollY } = useScroll();
-  const [vh, setVh] = useState(800);
+  const lenis        = useLenis();
+  const { scrollY }  = useScroll();
+  const [vh, setVh]  = useState(800);
+  const lastTap      = useRef(0);   // debounce accidental scroll-touches
 
   useEffect(() => {
     setVh(window.innerHeight);
@@ -33,6 +34,12 @@ export function PillNav() {
   const pointerEvents = useTransform(opacity, (v) => (v < 0.05 ? "none" : "auto"));
 
   function scrollTo(target: string) {
+    /* 300 ms debounce — prevents accidental home-scroll during touch scrolling */
+    if (target === "#hero") {
+      const now = Date.now();
+      if (now - lastTap.current < 300) return;
+      lastTap.current = now;
+    }
     if (lenis) {
       lenis.scrollTo(target === "#hero" ? 0 : target, { duration: 1.4 });
     } else {
@@ -84,8 +91,9 @@ export function PillNav() {
               fontWeight: 500,
               letterSpacing: "0.06em",
               textTransform: "lowercase",
-              lineHeight: 1,
-              transition: "opacity 150ms ease",
+              lineHeight:    1,
+              transition:    "opacity 150ms ease",
+              touchAction:   "manipulation",  // prevent accidental scroll-trigger on touch
             }}
             onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.45")}
             onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}

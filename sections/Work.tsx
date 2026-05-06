@@ -15,8 +15,8 @@ export type { Project, Layout };
 
 /* ─── Thumbnail hover card ──────────────────────── */
 
-function Thumbnail({ project, visible, x, y }: {
-  project: Project | null; visible: boolean; x: number; y: number;
+function Thumbnail({ project, visible, x, y, mobile = false }: {
+  project: Project | null; visible: boolean; x: number; y: number; mobile?: boolean;
 }) {
   return (
     <AnimatePresence>
@@ -27,7 +27,19 @@ function Thumbnail({ project, visible, x, y }: {
           animate={{ opacity: 1,  scale: 1    }}
           exit={{    opacity: 0,  scale: 0.88 }}
           transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          style={{
+          style={mobile ? {
+            /* mobile: centred in the right half of the screen, below the list */
+            position:       "fixed",
+            right:          "clamp(1rem, 5vw, 2rem)",
+            bottom:         "clamp(5rem, 12vh, 8rem)",
+            width:          120,
+            height:         86,
+            borderRadius:   4,
+            background:     project.accent,
+            pointerEvents:  "none",
+            zIndex:         200,
+            overflow:       "hidden",
+          } : {
             position:       "fixed",
             left:           x + 20,
             top:            y - 60,
@@ -38,9 +50,6 @@ function Thumbnail({ project, visible, x, y }: {
             pointerEvents:  "none",
             zIndex:         200,
             overflow:       "hidden",
-            display:        "flex",
-            alignItems:     "center",
-            justifyContent: "center",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -58,17 +67,33 @@ function Thumbnail({ project, visible, x, y }: {
 
 /* ─── Work Index row ────────────────────────────── */
 
-function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
+function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: {
   project:     Project;
   onHover:     (p: Project) => void;
   onLeave:     () => void;
   onMouseMove: (x: number, y: number) => void;
   onClick:     () => void;
+  onInView?:   (p: Project | null) => void;
 }) {
   const [active, setActive] = useState(false);
+  const rowRef = useRef<HTMLButtonElement>(null);
+
+  /* Mobile scroll-triggered thumbnail — fires when row is ≥ 50 % visible */
+  useEffect(() => {
+    if (!onInView) return;
+    const el = rowRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => onInView(entry.isIntersecting ? project : null),
+      { threshold: 0.5 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [onInView, project]);
 
   return (
     <motion.button
+      ref={rowRef}
       onClick={onClick}
       onMouseEnter={() => { setActive(true);  onHover(project); }}
       onMouseLeave={() => { setActive(false); onLeave(); }}
@@ -145,12 +170,20 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
 /* ─── Part A: Work Index ────────────────────────── */
 
 export function WorkIndex({ projects: propProjects }: { projects?: Project[] } = {}) {
-  const projects = propProjects ?? PROJECTS;
-  const [hovered, setHovered]  = useState<Project | null>(null);
-  const [cursorPos, setCursor] = useState({ x: 0, y: 0 });
+  const projects   = propProjects ?? PROJECTS;
+  const isMobile   = useIsMobile();
+  const [hovered,       setHovered]  = useState<Project | null>(null);
+  const [cursorPos,     setCursor]   = useState({ x: 0, y: 0 });
+  const [mobileActive,  setMobileActive] = useState<Project | null>(null);
 
   const handleMouseMove = useCallback((x: number, y: number) => {
     setCursor({ x, y });
+  }, []);
+
+  /* Mobile: show the thumbnail of whichever row most recently entered view.
+     Multiple rows can fire; last-in-wins is fine for a scroll reveal. */
+  const handleInView = useCallback((p: Project | null) => {
+    if (p) setMobileActive(p);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -166,7 +199,10 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
         padding:    "clamp(6rem, 15vh, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vh, 6rem)",
       }}
     >
-      <Thumbnail project={hovered} visible={!!hovered} x={cursorPos.x} y={cursorPos.y} />
+      {/* Desktop: cursor-follow thumbnail */}
+      {!isMobile && <Thumbnail project={hovered} visible={!!hovered} x={cursorPos.x} y={cursorPos.y} />}
+      {/* Mobile: scroll-triggered thumbnail pinned to bottom-right */}
+      {isMobile  && <Thumbnail project={mobileActive} visible={!!mobileActive} x={0} y={0} mobile />}
 
       <div>
 
@@ -180,7 +216,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
           </span>
         </div>
 
-        {/* Per-row intersection-triggered fade — each row fires its own observer */}
+        {/* Per-row fade-in; on mobile each row also drives the thumbnail */}
         <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
           {projects.map((p) => (
             <motion.div
@@ -192,10 +228,11 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
             >
               <WorkRow
                 project={p}
-                onHover={setHovered}
-                onLeave={() => setHovered(null)}
+                onHover={isMobile ? () => {} : setHovered}
+                onLeave={isMobile ? () => {} : () => setHovered(null)}
                 onMouseMove={handleMouseMove}
                 onClick={() => scrollTo(p.id)}
+                onInView={isMobile ? handleInView : undefined}
               />
             </motion.div>
           ))}
@@ -345,7 +382,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const idleRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [ready,   setReady]   = useState(false);
-  const [paused,  setPaused]  = useState(false);
+  const [paused,  setPaused]  = useState(true);   // true until autoPlay fires
   const [muted,   setMuted]   = useState(true);
   const [ctrlVis, setCtrlVis] = useState(false);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 40%"] });
@@ -416,6 +453,8 @@ export function FullscreenVideo({ project }: { project: Project }) {
         poster={imageUrl(project.id, "poster")}
         autoPlay muted loop playsInline preload="auto"
         onCanPlay={() => setReady(true)}
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
       />
       <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 1.2vw, 1rem)", color: "#fff", opacity: ready ? 0 : 0.35, textTransform: "uppercase", letterSpacing: "0.08em", transition: "opacity 0.5s ease", pointerEvents: "none" }}>
@@ -465,6 +504,17 @@ export function FullscreenVideo({ project }: { project: Project }) {
 
 const CARD_COUNT = 5;
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
+
 function useCardDims() {
   const [dims, setDims] = useState({ w: 180, h: 320, spacing: 130 });
   useEffect(() => {
@@ -481,6 +531,60 @@ function useCardDims() {
     return () => window.removeEventListener("resize", calc);
   }, []);
   return dims;
+}
+
+/* ─── Mobile social card — vertical list item ─── */
+
+function MobileVideoCard({ src, poster, accent, label, forcePause }: {
+  src:        string;
+  poster:     string;
+  accent:     string;
+  label:      string;
+  forcePause: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
+  }, [forcePause]);
+
+  const handleClick = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.volume = 0.7;
+      videoRef.current.play().catch(() => {});
+      setPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setPlaying(false);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      style={{ position: "relative", width: "100%", aspectRatio: "9 / 16", borderRadius: 14, overflow: "hidden", background: accent, cursor: "pointer", flexShrink: 0 }}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        loop playsInline preload="metadata"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+      />
+      {/* gradient */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.7))", pointerEvents: "none" }} />
+      {/* play / pause icon */}
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: playing ? 0 : 0.75, transition: "opacity 0.2s", pointerEvents: "none" }}>
+        <svg width="20" height="22" viewBox="0 0 12 14" fill="none"><polygon points="1,1 11,7 1,13" fill="#fff" /></svg>
+      </div>
+      {/* label */}
+      <div style={{ position: "absolute", bottom: "0.75rem", left: "0.75rem", fontFamily: FONT_MONA, fontSize: "0.6rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        {label}
+      </div>
+    </div>
+  );
 }
 
 function SocialCard({
@@ -641,6 +745,7 @@ export function SocialGrid({ project }: { project: Project }) {
   const [offScreen,    setOffScreen]    = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { w: cardW, h: cardH, spacing: cardSpacing } = useCardDims();
+  const isMobile = useIsMobile();
 
   /* Pause all videos when this section scrolls off screen */
   useEffect(() => {
@@ -655,6 +760,36 @@ export function SocialGrid({ project }: { project: Project }) {
     return () => obs.disconnect();
   }, []);
 
+  /* ── Mobile: vertical scrollable list ── */
+  if (isMobile) {
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "0.75rem",
+          padding:       "clamp(0.5rem, 1.5vh, 1rem) clamp(1rem, 5vw, 2rem) clamp(1rem, 3vh, 2rem)",
+        }}
+      >
+        {Array.from({ length: CARD_COUNT }, (_, i) => {
+          const n = String(i + 1).padStart(2, "0");
+          return (
+            <MobileVideoCard
+              key={i}
+              src={videoUrl(project.id, `grid-${n}`)}
+              poster={imageUrl(project.id, `grid-${n}-thumb`)}
+              accent={project.accent}
+              label={`${project.name} / ${n}`}
+              forcePause={offScreen}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* ── Desktop: fan layout ── */
   return (
     <div
       ref={containerRef}
@@ -728,11 +863,11 @@ export function HorizontalTimeline({ project }: { project: Project }) {
   useEffect(() => {
     if (panels.length === 0) return;
     /* Returns how many px the gallery must travel until the last panel's
-       right edge aligns with the viewport right edge (excludes paddingRight). */
+       right edge is flush with the right padding — equal to the left padding.
+       (Includes paddingRight so both ends have symmetric 5vw breathing room.) */
     const getDistance = () => {
       if (!galleryRef.current) return 0;
-      const pr = parseFloat(getComputedStyle(galleryRef.current).paddingRight) || 0;
-      return Math.max(0, galleryRef.current.scrollWidth - pr - window.innerWidth);
+      return Math.max(0, galleryRef.current.scrollWidth - window.innerWidth);
     };
 
     /* Push the correct pixel offset to xMotion from current progress. */
@@ -906,7 +1041,10 @@ export function CaseStudy({ project }: { project: Project }) {
         style={{
           position:      "relative",
           zIndex:        1,
-          minHeight:     "100vh",
+          /* grid+timeline projects (FG, Personal) put SocialGrid in Block B outside
+             this div — clamp minHeight to "auto" so there is no blank 100vh gap
+             between description and cards. Video projects keep 100vh. */
+          minHeight:     (hasTimeline && project.layout === "grid9x16") ? "auto" : "100vh",
           display:       "flex",
           flexDirection: "column",
         }}
