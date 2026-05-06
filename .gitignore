@@ -41,6 +41,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local media — served from Cloudflare R2 in production
+/public/projects/
+/public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

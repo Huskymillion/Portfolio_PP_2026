@@ -5,8 +5,8 @@ backend:
   base_url: https://huskymillion.com
   auth_endpoint: api/auth
 
-media_folder: public/uploads
-public_folder: /uploads
+media_folder: uploads
+public_folder: https://pub-0138911b93ac4d2288711fb008e069c8.r2.dev/uploads
 
 collections:
   - name: projects
