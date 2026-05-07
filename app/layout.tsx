@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { PillNav } from "@/components/PillNav";
 import "./globals.css";
@@ -44,6 +45,12 @@ export default function RootLayout({
           {children}
           <PillNav />
         </SmoothScrollProvider>
+        <Script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "dc4e4fd3c646463fb2d6603bd91bc876"}'
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
