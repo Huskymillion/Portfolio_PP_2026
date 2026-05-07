@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { ScrambleText } from "@/components/ScrambleText";
 
 /* ─── Copy ─────────────────────────────────────── */
@@ -175,14 +175,14 @@ export function Hero() {
       <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
 
         {/* Top half */}
-        <motion.div style={{ position: "absolute", inset: 0, clipPath: "inset(0 0 50% 0)", y: topY, willChange: "transform" }}>
+        <m.div style={{ position: "absolute", inset: 0, clipPath: "inset(0 0 50% 0)", y: topY, willChange: "transform" }}>
           <HeroInner revealedUpTo={revealedUpTo} pos={pos} titleRef={titleRef} servusRef={servusRef} helloRef={helloRef} wrapperRef={wrapperRef} />
-        </motion.div>
+        </m.div>
 
         {/* Bottom half */}
-        <motion.div style={{ position: "absolute", inset: 0, clipPath: "inset(50% 0 0 0)", y: bottomY, willChange: "transform" }}>
+        <m.div style={{ position: "absolute", inset: 0, clipPath: "inset(50% 0 0 0)", y: bottomY, willChange: "transform" }}>
           <HeroInner revealedUpTo={revealedUpTo} pos={pos} wrapperRef={wrapperRef} />
-        </motion.div>
+        </m.div>
 
       </div>
     </div>

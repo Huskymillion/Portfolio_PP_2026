@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
@@ -31,7 +31,7 @@ function useIsDesktop() {
 function BrandName({ name, index }: { name: string; index: number }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <motion.span
+    <m.span
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       animate={{ color: hovered ? "#0a0a0a" : "#888" }}
@@ -51,7 +51,7 @@ function BrandName({ name, index }: { name: string; index: number }) {
       }}
     >
       {name}
-    </motion.span>
+    </m.span>
   );
 }
 

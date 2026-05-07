@@ -13,6 +13,25 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
+
+  async headers() {
+    return [
+      {
+        // Immutable static assets (JS/CSS chunks, fonts with content-hash names)
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Public folder assets (favicons, og-image, etc.)
+        source: "/:path(.*\\.(?:svg|ico|png|jpg|jpeg|webp|woff2|woff|ttf|otf))",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

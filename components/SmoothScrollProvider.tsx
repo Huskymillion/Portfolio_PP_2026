@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { LazyMotion, domAnimation } from "framer-motion";
 import Lenis from "lenis";
 
 const LenisContext = createContext<Lenis | null>(null);
@@ -33,5 +34,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
+  return (
+    <LazyMotion features={domAnimation} strict>
+      <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>
+    </LazyMotion>
+  );
 }

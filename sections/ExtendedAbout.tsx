@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 const ACCENT    = "#E0115F";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
@@ -44,7 +44,7 @@ interface RevealBarProps {
 
 function RevealBar({ index, direction, delay, triggered }: RevealBarProps) {
   return (
-    <motion.div
+    <m.div
       aria-hidden
       initial={{ x: direction === 1 ? "-100%" : "100%" }}
       animate={triggered ? { x: direction === 1 ? "101%" : "-101%" } : {}}

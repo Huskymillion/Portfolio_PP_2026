@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { Zap } from "lucide-react";
 import { useLenis } from "./SmoothScrollProvider";
 
@@ -49,7 +49,7 @@ export function PillNav() {
   }
 
   return (
-    <motion.nav
+    <m.nav
       style={{
         opacity,
         pointerEvents,
@@ -102,6 +102,6 @@ export function PillNav() {
           </button>
         ))}
       </div>
-    </motion.nav>
+    </m.nav>
   );
 }

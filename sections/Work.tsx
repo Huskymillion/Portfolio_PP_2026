@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, type MotionValue } from "framer-motion";
+import Image from "next/image";
+import { m, AnimatePresence, useScroll, useTransform, useMotionValue, type MotionValue } from "framer-motion";
 import { PROJECTS, type Project, type Layout } from "@/lib/projects";
 import { imageUrl, videoUrl } from "@/lib/media";
+import { useInView } from "@/lib/hooks";
 
 /* ─── Constants ─────────────────────────────────── */
 
@@ -21,7 +23,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
   return (
     <AnimatePresence>
       {visible && project && (
-        <motion.div
+        <m.div
           key={project.id}
           initial={{ opacity: 0, scale: 0.88 }}
           animate={{ opacity: 1,  scale: 1    }}
@@ -59,7 +61,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -92,7 +94,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
   }, [onInView, project]);
 
   return (
-    <motion.button
+    <m.button
       ref={rowRef}
       onClick={onClick}
       onMouseEnter={() => { setActive(true);  onHover(project); }}
@@ -114,7 +116,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
       transition={{ duration: 0.2, ease: "easeOut" }}
     >
       {/* Number pill */}
-      <motion.div
+      <m.div
         animate={{ background: active ? ACCENT : "transparent", borderColor: active ? ACCENT : "#0a0a0a" }}
         transition={{ duration: 0.15 }}
         style={{
@@ -127,24 +129,24 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
           justifyContent: "center",
         }}
       >
-        <motion.span
+        <m.span
           animate={{ color: active ? "#fff" : "#0a0a0a" }}
           transition={{ duration: 0.15 }}
           style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.35rem, 2.3vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1 }}
         >
           {project.id}
-        </motion.span>
-      </motion.div>
+        </m.span>
+      </m.div>
 
       {/* Project info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <motion.div
+        <m.div
           animate={{ color: active ? ACCENT : "#0a0a0a" }}
           transition={{ duration: 0.15 }}
           style={{ fontFamily: FONT_MONA, fontSize: "clamp(1rem, 2.2vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", textTransform: "uppercase", lineHeight: 1 }}
         >
           {project.name}
-        </motion.div>
+        </m.div>
         <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", marginTop: "0.3rem", letterSpacing: "0.04em", textTransform: "lowercase" }}>
           {project.type}
         </div>
@@ -156,14 +158,14 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
       </div>
 
       {/* '+' reveal */}
-      <motion.span
+      <m.span
         animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.5, x: active ? 0 : -6 }}
         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.1rem, 1.8vw, 1.6rem)", fontWeight: 900, color: ACCENT, flexShrink: 0, width: "1.6rem", textAlign: "center", lineHeight: 1, display: "block" }}
       >
         +
-      </motion.span>
-    </motion.button>
+      </m.span>
+    </m.button>
   );
 }
 
@@ -219,7 +221,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
         {/* Per-row fade-in; on mobile each row also drives the thumbnail */}
         <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
           {projects.map((p) => (
-            <motion.div
+            <m.div
               key={p.id}
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -234,7 +236,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
                 onClick={() => scrollTo(p.id)}
                 onInView={isMobile ? handleInView : undefined}
               />
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -270,7 +272,7 @@ function OverviewCard({
   };
 
   return (
-    <motion.button
+    <m.button
       onClick={scrollTo}
       style={{
         opacity,
@@ -302,7 +304,7 @@ function OverviewCard({
           {project.type}
         </div>
       </div>
-    </motion.button>
+    </m.button>
   );
 }
 
@@ -381,11 +383,24 @@ export function FullscreenVideo({ project }: { project: Project }) {
   const ref      = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const idleRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [ready,   setReady]   = useState(false);
-  const [paused,  setPaused]  = useState(true);   // true until autoPlay fires
-  const [muted,   setMuted]   = useState(true);
-  const [ctrlVis, setCtrlVis] = useState(false);
+  const [ready,     setReady]     = useState(false);
+  const [paused,    setPaused]    = useState(true);
+  const [muted,     setMuted]     = useState(true);
+  const [ctrlVis,   setCtrlVis]   = useState(false);
+  const [srcActive, setSrcActive] = useState(false); // lazy-inject src when near viewport
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 40%"] });
+
+  /* Lazy-load: inject src only when the container is within 300 px of the viewport */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setSrcActive(true); obs.disconnect(); } },
+      { rootMargin: "300px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   /* Scroll-triggered play / pause */
   useEffect(() => {
@@ -449,9 +464,9 @@ export function FullscreenVideo({ project }: { project: Project }) {
     >
       <video
         ref={videoRef}
-        src={videoUrl(project.id, "hero")}
+        src={srcActive ? videoUrl(project.id, "hero") : undefined}
         poster={imageUrl(project.id, "poster")}
-        autoPlay muted loop playsInline preload="auto"
+        autoPlay muted loop playsInline preload="none"
         onCanPlay={() => setReady(true)}
         onPlay={() => setPaused(false)}
         onPause={() => setPaused(true)}
@@ -462,7 +477,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
       </span>
 
       {/* Controls — fade in on mouse move, fade out after 2.5s idle */}
-      <motion.div
+      <m.div
         animate={{ opacity: ctrlVis ? 1 : 0 }}
         transition={{ duration: 0.25 }}
         style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}
@@ -474,9 +489,9 @@ export function FullscreenVideo({ project }: { project: Project }) {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="#fff"><rect x="4" y="3" width="4" height="14" rx="1"/><rect x="12" y="3" width="4" height="14" rx="1"/></svg>
           )}
         </div>
-      </motion.div>
+      </m.div>
 
-      <motion.button
+      <m.button
         animate={{ opacity: ctrlVis ? 1 : 0 }}
         transition={{ duration: 0.25 }}
         onClick={toggleMute}
@@ -495,7 +510,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
             <path d="M16.5 5.5C18.5 7 19.5 8.4 19.5 10C19.5 11.6 18.5 13 16.5 14.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         )}
-      </motion.button>
+      </m.button>
     </div>
   );
 }
@@ -536,7 +551,7 @@ function useCardDims() {
 /* ─── Mobile social card — vertical list item ─── */
 
 function MobileVideoCard({ src, poster, accent, label, forcePause }: {
-  src:        string;
+  src:        string | undefined;
   poster:     string;
   accent:     string;
   label:      string;
@@ -570,7 +585,7 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
         ref={videoRef}
         src={src}
         poster={poster}
-        loop playsInline preload="metadata"
+        loop playsInline preload="none"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
       />
       {/* gradient */}
@@ -588,13 +603,14 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
 }
 
 function SocialCard({
-  project, index, hoveredIndex, setHoveredIndex, forcePause, cardW, cardH, cardSpacing,
+  project, index, hoveredIndex, setHoveredIndex, forcePause, srcReady, cardW, cardH, cardSpacing,
 }: {
   project:         Project;
   index:           number;
   hoveredIndex:    number | null;
   setHoveredIndex: (i: number | null) => void;
   forcePause:      boolean;
+  srcReady:        boolean;
   cardW:           number;
   cardH:           number;
   cardSpacing:     number;
@@ -653,7 +669,7 @@ function SocialCard({
   const n = String(index + 1).padStart(2, "0");
 
   return (
-    <motion.div
+    <m.div
       onHoverStart={() => handleHover(true)}
       onHoverEnd={() => handleHover(false)}
       onClick={handleClick}
@@ -680,18 +696,18 @@ function SocialCard({
         alignItems:      "flex-start",
       }}
     >
-      {/* Video — plays on hover, shows poster when paused */}
+      {/* Video — plays on hover; src only injected when grid is near viewport */}
       <video
         ref={videoRef}
-        src={videoUrl(project.id, `grid-${n}`)}
+        src={srcReady ? videoUrl(project.id, `grid-${n}`) : undefined}
         poster={imageUrl(project.id, `grid-${n}-thumb`)}
-        loop playsInline preload="metadata"
+        loop playsInline preload="none"
         muted={muted}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
       />
 
       {/* Play / Pause indicator */}
-      <motion.div
+      <m.div
         animate={{ opacity: playing ? 0.9 : (isHovered ? 1 : 0.65) }}
         transition={{ duration: 0.22 }}
         style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, pointerEvents: "none" }}
@@ -706,7 +722,7 @@ function SocialCard({
             <polygon points="1,1 11,7 1,13" fill="#fff" />
           </svg>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Bottom gradient for label legibility */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75))", zIndex: 1, pointerEvents: "none" }} />
@@ -736,16 +752,29 @@ function SocialCard({
           </button>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
 export function SocialGrid({ project }: { project: Project }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [offScreen,    setOffScreen]    = useState(false);
+  const [srcReady,     setSrcReady]     = useState(false); // lazy: inject src when near viewport
   const containerRef = useRef<HTMLDivElement>(null);
   const { w: cardW, h: cardH, spacing: cardSpacing } = useCardDims();
   const isMobile = useIsMobile();
+
+  /* Lazy-load: inject video src only when this section is within 300 px of the viewport */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setSrcReady(true); obs.disconnect(); } },
+      { rootMargin: "300px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   /* Pause all videos when this section scrolls off screen */
   useEffect(() => {
@@ -777,7 +806,7 @@ export function SocialGrid({ project }: { project: Project }) {
           return (
             <MobileVideoCard
               key={i}
-              src={videoUrl(project.id, `grid-${n}`)}
+              src={srcReady ? videoUrl(project.id, `grid-${n}`) : undefined}
               poster={imageUrl(project.id, `grid-${n}-thumb`)}
               accent={project.accent}
               label={`${project.name} / ${n}`}
@@ -813,6 +842,7 @@ export function SocialGrid({ project }: { project: Project }) {
             hoveredIndex={hoveredIndex}
             setHoveredIndex={setHoveredIndex}
             forcePause={offScreen}
+            srcReady={srcReady}
             cardW={cardW}
             cardH={cardH}
             cardSpacing={cardSpacing}
@@ -922,7 +952,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
           → scroll
         </div>
 
-        <motion.div
+        <m.div
           ref={galleryRef}
           style={{
             display:    "flex",
@@ -951,12 +981,14 @@ export function HorizontalTimeline({ project }: { project: Project }) {
               <img
                 src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             </div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );
@@ -1033,7 +1065,7 @@ export function CaseStudy({ project }: { project: Project }) {
     >
 
       {/* Fade-in entry: meta + first content block */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0 }}
@@ -1053,7 +1085,7 @@ export function CaseStudy({ project }: { project: Project }) {
 
         {/* Description block — sits between header and media */}
         {project.description && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -1063,7 +1095,7 @@ export function CaseStudy({ project }: { project: Project }) {
             <p style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.88rem, 1.1vw, 1rem)", fontWeight: 400, color: textMuted, lineHeight: 1.7, maxWidth: "800px", margin: 0 }}>
               {project.description}
             </p>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Content fills remaining viewport height */}
@@ -1082,7 +1114,7 @@ export function CaseStudy({ project }: { project: Project }) {
             <SocialGrid project={project} />
           )}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Block B — Social grid for dual-layout projects (grid9x16 + timeline).
           Renders before the timeline so the section order is: header → cards → panels. */}

@@ -1,10 +1,13 @@
+import dynamic                   from "next/dynamic";
 import { Hero }                  from "@/sections/Hero";
 import { About }                 from "@/sections/About";
 import { WorkIndex, CaseStudy }  from "@/sections/Work";
-import { ExtendedAbout }         from "@/sections/ExtendedAbout";
-import { Brands }                from "@/sections/Brands";
-import { Contact }               from "@/sections/Contact";
 import { getProjectsFromCMS }    from "@/lib/cms-projects";
+
+/* Below-fold sections — loaded in a separate JS chunk to reduce initial bundle size */
+const ExtendedAbout = dynamic(() => import("@/sections/ExtendedAbout").then(m => ({ default: m.ExtendedAbout })));
+const Brands        = dynamic(() => import("@/sections/Brands").then(m => ({ default: m.Brands })));
+const Contact       = dynamic(() => import("@/sections/Contact").then(m => ({ default: m.Contact })));
 
 export default async function Home() {
   const projects = await getProjectsFromCMS();

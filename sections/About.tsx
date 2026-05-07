@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 /* ─── Constants ─────────────────────────────────── */
 
@@ -40,7 +40,7 @@ function RevealBar({ spec, triggered }: { spec: BarSpec; triggered: boolean }) {
   const delay = 0.15 + (spec.index / spec.total) * 0.45;
 
   return (
-    <motion.div
+    <m.div
       aria-hidden
       initial={{ x: 0 }}
       animate={triggered ? { x: `${dir * 110}%` } : { x: 0 }}
