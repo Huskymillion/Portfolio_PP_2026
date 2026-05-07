@@ -75,6 +75,7 @@ export function PillNav() {
         {ITEMS.map((item, i) => (
           <button
             key={i}
+            aria-label={item.label ?? "Back to top"}
             onClick={() => scrollTo(item.target)}
             style={{
               display: "flex",

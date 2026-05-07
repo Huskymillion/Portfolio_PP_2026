@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
  * (plus optional rootMargin so we can pre-trigger before it's actually visible).
  * Used to lazy-inject video `src` attributes so out-of-view videos never load.
  */
-export function useInView(rootMargin = "300px") {
+export function useInView(rootMargin = "500px") {
   const ref    = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 

@@ -396,7 +396,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setSrcActive(true); obs.disconnect(); } },
-      { rootMargin: "300px" },
+      { rootMargin: "500px" },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -457,21 +457,28 @@ export function FullscreenVideo({ project }: { project: Project }) {
   return (
     <div
       ref={ref}
+      role="button"
+      tabIndex={0}
+      aria-label={paused ? `Play ${project.name} video` : `Pause ${project.name} video`}
       onClick={togglePlay}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePlay(); } }}
       onMouseMove={showControls}
       onMouseLeave={() => { setCtrlVis(false); if (idleRef.current) clearTimeout(idleRef.current); }}
       style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "#000000", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
     >
-      <video
-        ref={videoRef}
-        src={srcActive ? videoUrl(project.id, "hero") : undefined}
-        poster={imageUrl(project.id, "poster")}
-        autoPlay muted loop playsInline preload="none"
-        onCanPlay={() => setReady(true)}
-        onPlay={() => setPaused(false)}
-        onPause={() => setPaused(true)}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
-      />
+      {/* Video — element not in DOM at all until section is near viewport */}
+      {srcActive && (
+        <video
+          ref={videoRef}
+          src={videoUrl(project.id, "hero")}
+          autoPlay muted loop playsInline preload="none"
+          onCanPlay={() => setReady(true)}
+          onPlay={() => setPaused(false)}
+          onPause={() => setPaused(true)}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
+        />
+      )}
+      {/* Placeholder text while video is not yet loaded */}
       <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 1.2vw, 1rem)", color: "#fff", opacity: ready ? 0 : 0.35, textTransform: "uppercase", letterSpacing: "0.08em", transition: "opacity 0.5s ease", pointerEvents: "none" }}>
         {project.name}
       </span>
@@ -492,19 +499,20 @@ export function FullscreenVideo({ project }: { project: Project }) {
       </m.div>
 
       <m.button
+        aria-label={muted ? "Unmute video" : "Mute video"}
         animate={{ opacity: ctrlVis ? 1 : 0 }}
         transition={{ duration: 0.25 }}
         onClick={toggleMute}
         style={{ position: "absolute", bottom: "1.25rem", right: "1.25rem", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", border: "none", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", pointerEvents: ctrlVis ? "auto" : "none" }}
       >
         {muted ? (
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-label="Unmute">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
             <line x1="14" y1="7" x2="18" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
             <line x1="18" y1="7" x2="14" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         ) : (
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-label="Mute">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
             <path d="M14 8C15 8.8 15.5 9.4 15.5 10C15.5 10.6 15 11.2 14 12" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
             <path d="M16.5 5.5C18.5 7 19.5 8.4 19.5 10C19.5 11.6 18.5 13 16.5 14.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
@@ -581,19 +589,24 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
       onClick={handleClick}
       style={{ position: "relative", width: "100%", aspectRatio: "9 / 16", borderRadius: 14, overflow: "hidden", background: accent, cursor: "pointer", flexShrink: 0 }}
     >
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster}
-        loop playsInline preload="none"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-      />
+      {/* Video — not in DOM until SocialGrid section is near viewport */}
+      {src && (
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          loop playsInline preload="none"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      )}
       {/* gradient */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.7))", pointerEvents: "none" }} />
-      {/* play / pause icon */}
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: playing ? 0 : 0.75, transition: "opacity 0.2s", pointerEvents: "none" }}>
-        <svg width="20" height="22" viewBox="0 0 12 14" fill="none"><polygon points="1,1 11,7 1,13" fill="#fff" /></svg>
-      </div>
+      {/* play / pause icon — show only when video is ready to play */}
+      {src && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: playing ? 0 : 0.75, transition: "opacity 0.2s", pointerEvents: "none" }}>
+          <svg width="20" height="22" viewBox="0 0 12 14" fill="none"><polygon points="1,1 11,7 1,13" fill="#fff" /></svg>
+        </div>
+      )}
       {/* label */}
       <div style={{ position: "absolute", bottom: "0.75rem", left: "0.75rem", fontFamily: FONT_MONA, fontSize: "0.6rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>
         {label}
@@ -696,15 +709,17 @@ function SocialCard({
         alignItems:      "flex-start",
       }}
     >
-      {/* Video — plays on hover; src only injected when grid is near viewport */}
-      <video
-        ref={videoRef}
-        src={srcReady ? videoUrl(project.id, `grid-${n}`) : undefined}
-        poster={imageUrl(project.id, `grid-${n}-thumb`)}
-        loop playsInline preload="none"
-        muted={muted}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
-      />
+      {/* Video — not in DOM until section is within 500px of viewport */}
+      {srcReady && (
+        <video
+          ref={videoRef}
+          src={videoUrl(project.id, `grid-${n}`)}
+          poster={imageUrl(project.id, `grid-${n}-thumb`)}
+          loop playsInline preload="none"
+          muted={muted}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
+        />
+      )}
 
       {/* Play / Pause indicator */}
       <m.div
@@ -734,17 +749,18 @@ function SocialCard({
         </div>
         {isHovered && (
           <button
+            aria-label={muted ? "Unmute video" : "Mute video"}
             onClick={toggleMute}
             style={{ background: "rgba(0,0,0,0.55)", border: "none", borderRadius: "50%", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
           >
             {muted ? (
-              <svg width="10" height="10" viewBox="0 0 20 20" fill="none">
+              <svg width="10" height="10" viewBox="0 0 20 20" fill="none" aria-hidden>
                 <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
                 <line x1="14" y1="7" x2="18" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
                 <line x1="18" y1="7" x2="14" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             ) : (
-              <svg width="10" height="10" viewBox="0 0 20 20" fill="none">
+              <svg width="10" height="10" viewBox="0 0 20 20" fill="none" aria-hidden>
                 <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
                 <path d="M14 8C15 8.8 15.5 9.4 15.5 10C15.5 10.6 15 11.2 14 12" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
               </svg>
@@ -770,7 +786,7 @@ export function SocialGrid({ project }: { project: Project }) {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setSrcReady(true); obs.disconnect(); } },
-      { rootMargin: "300px" },
+      { rootMargin: "500px" },
     );
     obs.observe(el);
     return () => obs.disconnect();
