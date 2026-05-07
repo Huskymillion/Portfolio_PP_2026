@@ -9,7 +9,7 @@ layout: video16x9
 hasTimeline: true
 services: video + photography + motion + edit
 tagline: serving and protecting the canton
-description: Photography, video and motion production for the Cantonal Police of Bern — balancing authority with approachability.
+description: Photography, video and motion production for the Cantonal Police of Bern.
 tags:
   - video
   - photography

@@ -9,7 +9,7 @@ layout: grid9x16
 hasTimeline: false
 services: video + motion + edit
 tagline: energy for the city of zurich
-description: Video and motion work translating ewz's commitment to sustainable urban energy into compelling visual storytelling.
+description: Video and motion work ewz's employer branding campaign.
 tags:
   - photography
   - concept
