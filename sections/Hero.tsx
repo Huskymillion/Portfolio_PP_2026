@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { m, useScroll, useTransform } from "framer-motion";
 import { ScrambleText } from "@/components/ScrambleText";
 
@@ -14,10 +14,10 @@ const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 /* ─── Title position (measured once after fonts load) */
 
 interface TitlePos {
-  titleLeft:   number;  // px from viewport-left  = left edge of title (= left of "S" in SERVUS)
-  titleRight:  number;  // px from viewport-right  = right edge of title (= right of last char)
-  titleTop:    number;  // px from sticky-top      = top of title block
-  helloBottom: number;  // px from sticky-top      = bottom of +HELLO
+  titleLeft:   number;
+  titleRight:  number;
+  titleTop:    number;
+  helloBottom: number;
   ready:       boolean;
 }
 
@@ -25,9 +25,22 @@ const DEFAULT_POS: TitlePos = { titleLeft: -1, titleRight: -1, titleTop: -1, hel
 
 /* ─── Cycling scramble controller ───────────────── */
 
-const WORD_STEP  = 350;  // ms between each word being revealed
-const HOLD_ALL   = 2200; // ms to hold all words revealed before reset
-const RESET_GAP  = 600;  // ms gap after reset before next cycle
+const WORD_STEP  = 350;
+const HOLD_ALL   = 2200;
+const RESET_GAP  = 600;
+
+/* ─── Mobile detect ────────────────────────────── */
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
 
 /* ─── Hero inner layout ─────────────────────────── */
 
@@ -44,11 +57,6 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const vw = typeof window !== "undefined" ? window.innerWidth  : 1280;
 
-  /*
-   * Left column:  right edge touches left of "S" in SERVUS,  top at title top.
-   * Right column: left edge touches right of title,           bottom at bottom of +HELLO.
-   * Columns sit OUTSIDE the title — no overlap.
-   */
   const leftStyle: React.CSSProperties = pos.ready
     ? { position: "absolute", right: vw - pos.titleLeft + 16, top: pos.titleTop, display: "flex", flexDirection: "column", textAlign: "right" }
     : { position: "absolute", left: "clamp(1.5rem, 4vw, 5rem)", top: "clamp(2rem, 6vh, 5rem)", display: "flex", flexDirection: "column", textAlign: "right" };
@@ -106,30 +114,33 @@ export function Hero() {
   const titleRef   = useRef<HTMLDivElement>(null);
   const servusRef  = useRef<HTMLParagraphElement>(null);
   const helloRef   = useRef<HTMLParagraphElement>(null);
+  const isMobile   = useIsMobile();
 
-  const [pos, setPos]             = useState<TitlePos>(DEFAULT_POS);
+  const [pos, setPos]               = useState<TitlePos>(DEFAULT_POS);
   const [revealedUpTo, setRevealed] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* Measure title bounds relative to the sticky container (scrollY=0 → container.top=0) */
+  /*
+   * Measure title bounds for column positioning.
+   *
+   * FIX 2 — Scroll-jump removed:
+   * The sticky container is always at viewport-top while within the hero scroll
+   * range, so getBoundingClientRect() gives correct viewport-relative coords at
+   * any scrollY. The old window.scrollTo(0,0) → measure → scrollTo(savedY)
+   * pattern caused a visible jump on mobile when fonts loaded mid-scroll.
+   */
   useEffect(() => {
     const measure = () => {
-      if (!titleRef.current || !servusRef.current || !helloRef.current || !wrapperRef.current) return;
-      // Ensure we measure at scrollY=0 so sticky-container top === viewport top === 0
-      const savedY = window.scrollY;
-      if (savedY !== 0) window.scrollTo(0, 0);
-
-      const t  = titleRef.current.getBoundingClientRect();
-      const h  = helloRef.current.getBoundingClientRect();
+      if (!titleRef.current || !helloRef.current) return;
+      const t = titleRef.current.getBoundingClientRect();
+      const h = helloRef.current.getBoundingClientRect();
       setPos({
         titleLeft:   t.left,
         titleRight:  t.right,
         titleTop:    t.top,
         helloBottom: h.bottom,
-        ready: true,
+        ready:       true,
       });
-
-      if (savedY !== 0) window.scrollTo(0, savedY);
     };
     measure();
     document.fonts.ready.then(measure);
@@ -143,36 +154,56 @@ export function Hero() {
 
     const runCycle = () => {
       let idx = 0;
-
       const step = () => {
         setRevealed(idx);
         idx++;
         if (idx < maxWords) {
           timerRef.current = setTimeout(step, WORD_STEP);
         } else {
-          // Hold all revealed, then reset and restart
           timerRef.current = setTimeout(() => {
             setRevealed(-1);
             timerRef.current = setTimeout(runCycle, RESET_GAP);
           }, HOLD_ALL);
         }
       };
-
       step();
     };
 
-    timerRef.current = setTimeout(runCycle, 800); // initial delay
+    timerRef.current = setTimeout(runCycle, 800);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, []);
 
-  /* Scroll split */
+  /*
+   * Scroll split.
+   *
+   * FIX 1 — Mobile: shorter wrapper (140vh vs 200vh) and tighter split window
+   * [0.1 → 0.9] vs [0.3 → 0.85] so the dead zone after split completion
+   * shrinks from ~30vh to ~14vh, eliminating excessive whitespace before About.
+   *
+   * Both transforms are always created (hooks must not be conditional), then
+   * the appropriate one is selected based on isMobile.
+   */
   const { scrollYProgress } = useScroll({ target: wrapperRef, offset: ["start start", "end start"] });
-  const topY    = useTransform(scrollYProgress, [0.3, 0.85], ["0%", "-110%"]);
-  const bottomY = useTransform(scrollYProgress, [0.3, 0.85], ["0%",  "110%"]);
+
+  const topYDesktop    = useTransform(scrollYProgress, [0.3,  0.85], ["0%", "-110%"]);
+  const bottomYDesktop = useTransform(scrollYProgress, [0.3,  0.85], ["0%",  "110%"]);
+  const topYMobile     = useTransform(scrollYProgress, [0.1,  0.9 ], ["0%", "-110%"]);
+  const bottomYMobile  = useTransform(scrollYProgress, [0.1,  0.9 ], ["0%",  "110%"]);
+
+  const topY    = isMobile ? topYMobile    : topYDesktop;
+  const bottomY = isMobile ? bottomYMobile : bottomYDesktop;
+
+  const heroHeight = isMobile ? "140vh" : "200vh";
 
   return (
-    <div ref={wrapperRef} id="hero" style={{ height: "200vh", position: "relative" }}>
-      <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
+    <div ref={wrapperRef} id="hero" style={{ height: heroHeight, position: "relative" }}>
+      {/*
+        * FIX 1 — background: "#000" added to the sticky container.
+        * Previously the container had no background, so as the two halves
+        * (top/bottom m.div) animated apart the page background (#fafafa)
+        * bled through the gap. Now the container is always black.
+        */}
+      <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden", background: "#000" }}>
 
         {/* Top half */}
         <m.div style={{ position: "absolute", inset: 0, clipPath: "inset(0 0 50% 0)", y: topY, willChange: "transform" }}>
