@@ -32,8 +32,8 @@ function BrandName({ name, index }: { name: string; index: number }) {
   const [hovered, setHovered] = useState(false);
   return (
     <m.span
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      onPointerEnter={(e) => { if (e.pointerType === "mouse") setHovered(true); }}
+      onPointerLeave={(e) => { if (e.pointerType === "mouse") setHovered(false); }}
       animate={{ color: hovered ? "#0a0a0a" : "#888" }}
       transition={{ duration: 0.12 }}
       initial={{ opacity: 0 }}
