@@ -5,6 +5,7 @@ import { m, AnimatePresence, useScroll, useTransform, useMotionValue, type Motio
 import { PROJECTS, type Project, type Layout } from "@/lib/projects";
 import { imageUrl, videoUrl } from "@/lib/media";
 import { MobileProjectStrip } from "@/components/MobileProjectStrip";
+import { useCanHover } from "@/lib/hooks";
 
 /* ─── Constants ─────────────────────────────────── */
 
@@ -34,23 +35,19 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             right:          "clamp(1rem, 5vw, 2rem)",
             bottom:         "clamp(5rem, 12vh, 8rem)",
             width:          120,
-            height:         86,
             borderRadius:   4,
             background:     project.accent,
             pointerEvents:  "none",
             zIndex:         200,
-            overflow:       "hidden",
           } : {
             position:       "fixed",
             left:           x + 20,
             top:            y - 60,
             width:          140,
-            height:         100,
             borderRadius:   2,
             background:     project.accent,
             pointerEvents:  "none",
             zIndex:         200,
-            overflow:       "hidden",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -59,7 +56,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             alt=""
             loading="lazy"
             decoding="async"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ display: "block", width: "100%", height: "auto" }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
         </m.div>
@@ -79,6 +76,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
   onInView?:   (p: Project | null) => void;
 }) {
   const [active, setActive] = useState(false);
+  const canHover = useCanHover();
   const rowRef = useRef<HTMLButtonElement>(null);
 
   /* Mobile scroll-triggered thumbnail — fires when row is ≥ 50 % visible */
@@ -98,9 +96,9 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
     <m.button
       ref={rowRef}
       onClick={onClick}
-      onMouseEnter={() => { setActive(true);  onHover(project); }}
-      onMouseLeave={() => { setActive(false); onLeave(); }}
-      onMouseMove={(e) => onMouseMove(e.clientX, e.clientY)}
+      onPointerEnter={(e) => { if (e.pointerType !== "mouse") return; setActive(true);  onHover(project); }}
+      onPointerLeave={(e) => { if (e.pointerType !== "mouse") return; setActive(false); onLeave(); }}
+      onPointerMove={(e)  => { if (e.pointerType !== "mouse") return; onMouseMove(e.clientX, e.clientY); }}
       style={{
         display:      "flex",
         alignItems:   "center",
@@ -113,7 +111,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
         textAlign:    "left",
         gap:          "clamp(1.5rem, 4vw, 4rem)",
       }}
-      whileHover={{ x: 4 }}
+      whileHover={canHover ? { x: 4 } : undefined}
       transition={{ duration: 0.2, ease: "easeOut" }}
     >
       {/* Number pill */}
@@ -178,9 +176,24 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
   const [hovered,       setHovered]  = useState<Project | null>(null);
   const [cursorPos,     setCursor]   = useState({ x: 0, y: 0 });
   const [mobileActive,  setMobileActive] = useState<Project | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const handleMouseMove = useCallback((x: number, y: number) => {
     setCursor({ x, y });
+  }, []);
+
+  /* Clear mobile thumbnail when the entire Work section leaves the viewport —
+     prevents the last-tapped thumbnail persisting as a sticky overlay into
+     other sections after the user scrolls past the work index. */
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (!entry.isIntersecting) setMobileActive(null); },
+      { threshold: 0.05 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   /* Mobile: show the thumbnail of whichever row most recently entered view.
@@ -195,6 +208,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
 
   return (
     <section
+      ref={sectionRef}
       id="work"
       style={{
         position:   "relative",
@@ -268,6 +282,7 @@ function OverviewCard({
   const opacity = useTransform(scrollYProgress, [start, end], [0, 1]);
   const y       = useTransform(scrollYProgress, [start, end], [28, 0]);
 
+  const canHover = useCanHover();
   const scrollTo = () => {
     document.getElementById(`case-${project.id}`)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -292,7 +307,7 @@ function OverviewCard({
         textAlign:      "left",
         minHeight:      0,
       }}
-      whileHover={{ scale: 1.03, transition: { duration: 0.2, ease: "easeOut" } }}
+      whileHover={canHover ? { scale: 1.03, transition: { duration: 0.2, ease: "easeOut" } } : undefined}
     >
       <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", fontFamily: FONT_BRIER, fontSize: "0.6rem", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em" }}>
         {project.id}
@@ -465,24 +480,28 @@ export function FullscreenVideo({ project }: { project: Project }) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePlay(); } }}
       onMouseMove={showControls}
       onMouseLeave={() => { setCtrlVis(false); if (idleRef.current) clearTimeout(idleRef.current); }}
-      style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "#000000", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+      style={{ position: "relative", width: "100%", background: "#000000", cursor: "pointer" }}
     >
-      {/* Video — element not in DOM at all until section is near viewport */}
+      {/* Video — element not in DOM at all until section is near viewport.
+          poster gives the element its natural 16:9 dimensions before playback starts. */}
       {srcActive && (
         <video
           ref={videoRef}
           src={videoUrl(project.id, "hero")}
+          poster={imageUrl(project.id, "poster")}
           autoPlay muted loop playsInline preload="none"
           onCanPlay={() => setReady(true)}
           onPlay={() => setPaused(false)}
           onPause={() => setPaused(true)}
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
+          style={{ display: "block", width: "100%", height: "auto", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
         />
       )}
       {/* Placeholder text while video is not yet loaded */}
-      <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 1.2vw, 1rem)", color: "#fff", opacity: ready ? 0 : 0.35, textTransform: "uppercase", letterSpacing: "0.08em", transition: "opacity 0.5s ease", pointerEvents: "none" }}>
-        {project.name}
-      </span>
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+        <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 1.2vw, 1rem)", color: "#fff", opacity: ready ? 0 : 0.35, textTransform: "uppercase", letterSpacing: "0.08em", transition: "opacity 0.5s ease" }}>
+          {project.name}
+        </span>
+      </div>
 
       {/* Controls — fade in on mouse move, fade out after 2.5s idle */}
       <m.div
@@ -592,7 +611,7 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
   return (
     <div
       onClick={handleClick}
-      style={{ position: "relative", width: "100%", aspectRatio: "9 / 16", borderRadius: 14, overflow: "hidden", background: accent, cursor: "pointer", flexShrink: 0 }}
+      style={{ position: "relative", width: "100%", borderRadius: 14, background: accent, cursor: "pointer", flexShrink: 0 }}
     >
       {/* Video — not in DOM until SocialGrid section is near viewport */}
       {src && (
@@ -601,7 +620,7 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
           src={src}
           poster={poster}
           loop playsInline preload="none"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          style={{ display: "block", width: "100%", height: "auto" }}
         />
       )}
       {/* gradient */}
@@ -704,7 +723,6 @@ function SocialCard({
         width:           cardW,
         height:          cardH,
         borderRadius:    14,
-        overflow:        "hidden",
         background:      project.accent,
         cursor:          "pointer",
         transformOrigin: "bottom center",
@@ -877,20 +895,20 @@ export function SocialGrid({ project }: { project: Project }) {
 /* ─── Horizontal Image Timeline ──────────────────── */
 
 const LANDSCAPE_SIZES = [
-  { w: "62vw", h: "62vh" },
-  { w: "36vw", h: "74vh" },
-  { w: "50vw", h: "58vh" },
-  { w: "38vw", h: "70vh" },
-  { w: "58vw", h: "60vh" },
+  { w: "62vw" },
+  { w: "36vw" },
+  { w: "50vw" },
+  { w: "38vw" },
+  { w: "58vw" },
 ];
 
 // Kapo bern: second frame is featured — visibly larger than the rest
 const KAPO_SIZES = [
-  { w: "62vw", h: "62vh" },
-  { w: "48vw", h: "90vh" }, // ← enlarged second panel
-  { w: "50vw", h: "58vh" },
-  { w: "38vw", h: "70vh" },
-  { w: "58vw", h: "60vh" },
+  { w: "62vw" },
+  { w: "48vw" }, // ← enlarged second panel
+  { w: "50vw" },
+  { w: "38vw" },
+  { w: "58vw" },
 ];
 
 function getPanels(project: Project) {
@@ -990,12 +1008,9 @@ export function HorizontalTimeline({ project }: { project: Project }) {
             <div
               key={i}
               style={{
-                flexShrink: 0,
-                width:      panel.w,
-                height:     panel.h,
-                position:   "relative",
+                flexShrink:   0,
+                width:        panel.w,
                 borderRadius: 2,
-                overflow:   "hidden",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1004,7 +1019,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                 alt=""
                 loading="lazy"
                 decoding="async"
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
+                style={{ display: "block", width: "100%", height: "auto" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             </div>

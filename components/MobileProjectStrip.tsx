@@ -57,14 +57,12 @@ function buildMediaItems(project: Project): MediaItem[] {
 function VideoPanel({
   item,
   accent,
-  panelH,
   stripRef,
   srcReady,
   forcePause,
 }: {
   item:       VideoItem;
   accent:     string;
-  panelH:     string;
   stripRef:   React.RefObject<HTMLDivElement>;
   srcReady:   boolean;
   forcePause: boolean;
@@ -109,12 +107,9 @@ function VideoPanel({
       style={{
         flexShrink:      0,
         width:           "85vw",
-        height:          panelH,
         borderRadius:    8,
-        overflow:        "hidden",
         background:      accent,
         scrollSnapAlign: "start",
-        position:        "relative",
       }}
     >
       {srcReady && (
@@ -127,13 +122,7 @@ function VideoPanel({
           loop
           playsInline
           preload="none"
-          style={{
-            position:  "absolute",
-            inset:     0,
-            width:     "100%",
-            height:    "100%",
-            objectFit: "cover",
-          }}
+          style={{ display: "block", width: "100%", height: "auto" }}
         />
       )}
     </div>
@@ -145,23 +134,18 @@ function VideoPanel({
 function ImagePanel({
   item,
   accent,
-  panelH,
 }: {
   item:   ImageItem;
   accent: string;
-  panelH: string;
 }) {
   return (
     <div
       style={{
         flexShrink:      0,
         width:           "85vw",
-        height:          panelH,
         borderRadius:    8,
-        overflow:        "hidden",
         background:      accent,
         scrollSnapAlign: "start",
-        position:        "relative",
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -170,13 +154,7 @@ function ImagePanel({
         alt={item.alt}
         loading="lazy"
         decoding="async"
-        style={{
-          position:  "absolute",
-          inset:     0,
-          width:     "100%",
-          height:    "100%",
-          objectFit: "contain",
-        }}
+        style={{ display: "block", width: "100%", height: "auto" }}
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
       />
     </div>
@@ -192,14 +170,6 @@ export function MobileProjectStrip({ project }: { project: Project }) {
   const [srcReady,  setSrcReady]  = useState(false);
   const [offScreen, setOffScreen] = useState(false);
 
-  /*
-   * Panel height:
-   *  - video16x9 projects: 56.25 vw = perfect 16:9 at 90 vw panel width
-   *  - grid9x16 projects:  portrait-ish (min of 72 vh / 130 vw) so 9:16 videos
-   *    fill the panel with only a small top/bottom crop (~14 %) rather than
-   *    heavy letterboxing
-   */
-  const panelH = project.layout === "video16x9" ? "56.25vw" : "min(72vh, 130vw)";
 
   /* Lazy-load: inject src only when this section is within 500 px of viewport */
   useEffect(() => {
@@ -257,6 +227,7 @@ export function MobileProjectStrip({ project }: { project: Project }) {
         style={{
           display:                 "flex",
           flexDirection:           "row",
+          alignItems:              "flex-start",
           gap:                     "3vw",
           overflowX:               "auto",
           scrollSnapType:          "x mandatory",
@@ -274,7 +245,6 @@ export function MobileProjectStrip({ project }: { project: Project }) {
               key={i}
               item={item}
               accent={project.accent}
-              panelH={panelH}
               stripRef={stripRef as React.RefObject<HTMLDivElement>}
               srcReady={srcReady}
               forcePause={offScreen}
@@ -284,7 +254,6 @@ export function MobileProjectStrip({ project }: { project: Project }) {
               key={i}
               item={item}
               accent={project.accent}
-              panelH={panelH}
             />
           ),
         )}

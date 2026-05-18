@@ -1,5 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
+export function useCanHover() {
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setCanHover(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setCanHover(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return canHover;
+}
+
 /**
  * One-shot IntersectionObserver — fires once when element enters the viewport
  * (plus optional rootMargin so we can pre-trigger before it's actually visible).
