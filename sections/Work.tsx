@@ -35,6 +35,8 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             right:          "clamp(1rem, 5vw, 2rem)",
             bottom:         "clamp(5rem, 12vh, 8rem)",
             width:          120,
+            height:         86,
+            overflow:       "hidden",
             borderRadius:   4,
             background:     project.accent,
             pointerEvents:  "none",
@@ -44,6 +46,8 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             left:           x + 20,
             top:            y - 60,
             width:          140,
+            height:         100,
+            overflow:       "hidden",
             borderRadius:   2,
             background:     project.accent,
             pointerEvents:  "none",
@@ -56,7 +60,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
             alt=""
             loading="lazy"
             decoding="async"
-            style={{ display: "block", width: "100%", height: "auto" }}
+            style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
         </m.div>
@@ -418,12 +422,12 @@ export function FullscreenVideo({ project }: { project: Project }) {
     return () => obs.disconnect();
   }, []);
 
-  /* Scroll-triggered play / pause */
+  /* Scroll-triggered play: start when section is ~80% scrolled in.
+     Off-screen pause is handled by the IntersectionObserver below. */
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (v) => {
       if (!videoRef.current || !ready) return;
-      if (v > 0.8 && videoRef.current.paused)  { videoRef.current.play().catch(() => {}); setPaused(false); }
-      if (v < 0.3 && !videoRef.current.paused) { videoRef.current.pause(); setPaused(true); }
+      if (v > 0.8 && videoRef.current.paused) { videoRef.current.play().catch(() => {}); setPaused(false); }
     });
     return unsub;
   }, [scrollYProgress, ready]);
@@ -503,9 +507,9 @@ export function FullscreenVideo({ project }: { project: Project }) {
         </span>
       </div>
 
-      {/* Controls — fade in on mouse move, fade out after 2.5s idle */}
+      {/* Play indicator: always visible when paused; fades on hover during playback */}
       <m.div
-        animate={{ opacity: ctrlVis ? 1 : 0 }}
+        animate={{ opacity: paused ? 0.85 : (ctrlVis ? 0.6 : 0) }}
         transition={{ duration: 0.25 }}
         style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}
       >
@@ -723,6 +727,7 @@ function SocialCard({
         width:           cardW,
         height:          cardH,
         borderRadius:    14,
+        overflow:        "hidden",
         background:      project.accent,
         cursor:          "pointer",
         transformOrigin: "bottom center",
@@ -934,9 +939,23 @@ export function HorizontalTimeline({ project }: { project: Project }) {
     /* Returns how many px the gallery must travel until the last panel's
        right edge is flush with the right padding — equal to the left padding.
        (Includes paddingRight so both ends have symmetric 5vw breathing room.) */
+    /* scrollWidth is unreliable for flex children inside overflow:hidden parents
+       (Chromium reports clientWidth). Sum child rects + padding + gap instead. */
     const getDistance = () => {
-      if (!galleryRef.current) return 0;
-      return Math.max(0, galleryRef.current.scrollWidth - window.innerWidth);
+      const gallery = galleryRef.current;
+      if (!gallery) return 0;
+      const children = Array.from(gallery.children) as HTMLElement[];
+      if (children.length === 0) return 0;
+      const cs           = getComputedStyle(gallery);
+      const paddingLeft  = parseFloat(cs.paddingLeft)  || 0;
+      const paddingRight = parseFloat(cs.paddingRight) || 0;
+      const gap          = parseFloat(cs.gap)          || 0;
+      let totalW = paddingLeft + paddingRight;
+      children.forEach((child, i) => {
+        totalW += child.getBoundingClientRect().width;
+        if (i < children.length - 1) totalW += gap;
+      });
+      return Math.max(0, totalW - window.innerWidth);
     };
 
     /* Push the correct pixel offset to xMotion from current progress. */
@@ -957,8 +976,12 @@ export function HorizontalTimeline({ project }: { project: Project }) {
       applyX();
     };
 
-    // Run after first layout (fonts + flex affect scrollWidth).
+    // Run after first layout (fonts + flex affect measured widths).
     requestAnimationFrame(sync);
+
+    // Re-sync if images load and change panel sizes.
+    const ro = new ResizeObserver(sync);
+    if (galleryRef.current) ro.observe(galleryRef.current);
 
     // Drive xMotion on every Lenis / native scroll tick.
     const unsubscribe = scrollYProgress.on("change", applyX);
@@ -966,6 +989,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
     window.addEventListener("resize", sync);
     return () => {
       unsubscribe();
+      ro.disconnect();
       window.removeEventListener("resize", sync);
     };
   }, [scrollYProgress, xMotion, panels.length]);
@@ -1017,7 +1041,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
               <img
                 src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
-                loading="lazy"
+                loading="eager"
                 decoding="async"
                 style={{ display: "block", width: "100%", height: "auto" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}

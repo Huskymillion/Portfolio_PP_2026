@@ -52,6 +52,36 @@ function buildMediaItems(project: Project): MediaItem[] {
   return items;
 }
 
+/* ─── Square-frame play indicator (Swiss geometric style) ─── */
+
+function PlayIndicator({ visible }: { visible: boolean }) {
+  return (
+    <div style={{
+      position:       "absolute",
+      inset:          0,
+      display:        "flex",
+      alignItems:     "center",
+      justifyContent: "center",
+      opacity:        visible ? 0.85 : 0,
+      transition:     "opacity 0.25s ease",
+      pointerEvents:  "none",
+    }}>
+      <div style={{
+        display:        "flex",
+        alignItems:     "center",
+        justifyContent: "center",
+        width:          44,
+        height:         44,
+        border:         "1.5px solid rgba(255,255,255,0.8)",
+      }}>
+        <svg width="11" height="13" viewBox="0 0 9 11" fill="none" aria-hidden>
+          <polygon points="1,0 9,5.5 1,11" fill="rgba(255,255,255,0.9)" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Video panel ────────────────────────────────── */
 
 function VideoPanel({
@@ -72,9 +102,12 @@ function VideoPanel({
   const pauseRef   = useRef(forcePause);
   pauseRef.current = forcePause;
 
+  const [playing, setPlaying] = useState(false);
+  const [muted,   setMuted]   = useState(true); // starts muted (required for autoPlay)
+
   /* Respond immediately when the whole section leaves the viewport */
   useEffect(() => {
-    if (forcePause) videoRef.current?.pause();
+    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
   }, [forcePause]);
 
   /* Play/pause based on how much of this panel is visible inside the strip.
@@ -91,8 +124,10 @@ function VideoPanel({
         if (!video) return;
         if (entry.isIntersecting && !pauseRef.current) {
           video.play().catch(() => {});
+          setPlaying(true);
         } else {
           video.pause();
+          setPlaying(false);
         }
       },
       { root: strip, threshold: 0.6 },
@@ -101,10 +136,19 @@ function VideoPanel({
     return () => obs.disconnect();
   }, [srcReady, stripRef]);
 
+  const toggleMute = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  };
+
   return (
     <div
       ref={panelRef}
       style={{
+        position:        "relative",
         flexShrink:      0,
         width:           "85vw",
         borderRadius:    8,
@@ -122,8 +166,49 @@ function VideoPanel({
           loop
           playsInline
           preload="none"
-          style={{ display: "block", width: "100%", height: "auto" }}
+          style={{ display: "block", width: "100%", height: "auto", borderRadius: 8 }}
         />
+      )}
+
+      {/* Fix 2 — Square-frame play indicator */}
+      {srcReady && <PlayIndicator visible={!playing} />}
+
+      {/* Fix 1 — Mute/unmute toggle, bottom-right, mobile only */}
+      {srcReady && (
+        <button
+          aria-label={muted ? "Unmute video" : "Mute video"}
+          onClick={toggleMute}
+          style={{
+            position:       "absolute",
+            bottom:         "0.75rem",
+            right:          "0.75rem",
+            background:     "rgba(0,0,0,0.55)",
+            border:         "none",
+            borderRadius:   "50%",
+            width:          30,
+            height:         30,
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            cursor:         "pointer",
+            touchAction:    "manipulation",
+            zIndex:         2,
+          }}
+        >
+          {muted ? (
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
+              <line x1="14" y1="7" x2="18" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="18" y1="7" x2="14" y2="13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path d="M3 7H7L11 3V17L7 13H3V7Z" fill="#fff"/>
+              <path d="M14 8C15 8.8 15.5 9.4 15.5 10C15.5 10.6 15 11.2 14 12" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16.5 5.5C18.5 7 19.5 8.4 19.5 10C19.5 11.6 18.5 13 16.5 14.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
       )}
     </div>
   );
@@ -139,8 +224,11 @@ function ImagePanel({
   accent: string;
 }) {
   return (
+    /* Fix 3 — alignSelf: center so landscape image panels are vertically
+       centred in the strip row when alongside taller portrait video panels */
     <div
       style={{
+        alignSelf:       "center",
         flexShrink:      0,
         width:           "85vw",
         borderRadius:    8,
@@ -154,7 +242,7 @@ function ImagePanel({
         alt={item.alt}
         loading="lazy"
         decoding="async"
-        style={{ display: "block", width: "100%", height: "auto" }}
+        style={{ display: "block", width: "100%", height: "auto", borderRadius: 8 }}
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
       />
     </div>
@@ -169,7 +257,6 @@ export function MobileProjectStrip({ project }: { project: Project }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [srcReady,  setSrcReady]  = useState(false);
   const [offScreen, setOffScreen] = useState(false);
-
 
   /* Lazy-load: inject src only when this section is within 500 px of viewport */
   useEffect(() => {
