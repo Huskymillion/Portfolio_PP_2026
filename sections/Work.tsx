@@ -899,7 +899,9 @@ export function SocialGrid({ project }: { project: Project }) {
 
 /* ─── Horizontal Image Timeline ──────────────────── */
 
-const LANDSCAPE_SIZES = [
+type PanelSize = { w: string; h?: string };
+
+const LANDSCAPE_SIZES: PanelSize[] = [
   { w: "62vw" },
   { w: "36vw" },
   { w: "50vw" },
@@ -908,8 +910,8 @@ const LANDSCAPE_SIZES = [
 ];
 
 // Kapo bern: second frame is featured — visibly larger than the rest
-const KAPO_SIZES = [
-  { w: "62vw" },
+const KAPO_SIZES: PanelSize[] = [
+  { w: "auto", h: "calc(100vh - 4rem)" }, // portrait image — height-constrained so it never clips
   { w: "48vw" }, // ← enlarged second panel
   { w: "50vw" },
   { w: "38vw" },
