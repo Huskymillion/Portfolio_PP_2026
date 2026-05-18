@@ -19,14 +19,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pascalpfohl.com"),
-  title: "Pascal Pfohl — Creative Director & Art Director",
+  title: "Pascal Pfohl — Creative Content Producer",
   description:
-    "Pascal Pfohl is a creative director and art director based in Munich, specialising in advertising storytelling, brand campaigns, video, motion, and photography.",
-  keywords: ["creative director", "art director", "advertising", "video", "motion", "photography", "Munich", "Pascal Pfohl"],
+    "Pascal Pfohl is a creative content producer based in Munich, specialising in advertising storytelling, brand campaigns, video, motion, and photography.",
+  keywords: ["creative content producer", "content production", "advertising", "video", "motion", "photography", "Munich", "Pascal Pfohl"],
   authors: [{ name: "Pascal Pfohl" }],
   openGraph: {
-    title:       "Pascal Pfohl — Creative Director & Art Director",
-    description: "Creative direction, art direction, video & motion — Munich.",
+    title:       "Pascal Pfohl — Creative Content Producer",
+    description: "Creative content production, video & motion — Munich.",
     url:         "https://pascalpfohl.com",
     siteName:    "Pascal Pfohl",
     locale:      "en_US",
@@ -35,17 +35,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card:        "summary_large_image",
-    title:       "Pascal Pfohl — Creative Director & Art Director",
-    description: "Creative direction, art direction, video & motion — Munich.",
+    title:       "Pascal Pfohl — Creative Content Producer",
+    description: "Creative content production, video & motion — Munich.",
     images:      ["/og-image.jpg"],
   },
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "32x32" },
-    ],
-    apple:   "/favicon.svg",
-    shortcut: "/favicon.ico",
+    icon:  { url: "/favicon.svg", type: "image/svg+xml" },
+    apple: "/favicon.svg",
   },
 };
 

@@ -1,11 +1,10 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import Image from "next/image";
 import { m, AnimatePresence, useScroll, useTransform, useMotionValue, type MotionValue } from "framer-motion";
 import { PROJECTS, type Project, type Layout } from "@/lib/projects";
 import { imageUrl, videoUrl } from "@/lib/media";
-import { useInView } from "@/lib/hooks";
+import { MobileProjectStrip } from "@/components/MobileProjectStrip";
 
 /* ─── Constants ─────────────────────────────────── */
 
@@ -58,6 +57,8 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
           <img
             src={imageUrl(project.id, "thumb")}
             alt=""
+            loading="lazy"
+            decoding="async"
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
@@ -532,8 +533,10 @@ function useIsMobile() {
   useEffect(() => {
     const check = () => setMobile(window.innerWidth < 768);
     check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => { clearTimeout(timer); timer = setTimeout(check, 100); };
+    window.addEventListener("resize", onResize);
+    return () => { clearTimeout(timer); window.removeEventListener("resize", onResize); };
   }, []);
   return mobile;
 }
@@ -550,8 +553,10 @@ function useCardDims() {
       setDims({ w, h, spacing: Math.round(w * 0.72) });
     }
     calc();
-    window.addEventListener("resize", calc);
-    return () => window.removeEventListener("resize", calc);
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => { clearTimeout(timer); timer = setTimeout(calc, 100); };
+    window.addEventListener("resize", onResize);
+    return () => { clearTimeout(timer); window.removeEventListener("resize", onResize); };
   }, []);
   return dims;
 }
@@ -1061,6 +1066,7 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
 /* ─── Full Case Study section ───────────────────── */
 
 export function CaseStudy({ project }: { project: Project }) {
+  const isMobile    = useIsMobile();
   const hasTimeline = project.extra === "timeline";
   const dark        = !!project.darkSection;
   const sectionBg   = dark ? "#000000" : "#fafafa";
@@ -1080,6 +1086,30 @@ export function CaseStudy({ project }: { project: Project }) {
       }}
     >
 
+      {/* Mobile-only sticky header — shows project id + name as you scroll through */}
+      {isMobile && (
+        <div
+          style={{
+            position:     "sticky",
+            top:          0,
+            zIndex:       20,
+            background:   sectionBg,
+            borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+            display:      "flex",
+            alignItems:   "center",
+            gap:          "0.75rem",
+            padding:      "0.6rem clamp(1rem, 4vw, 1.5rem)",
+          }}
+        >
+          <span style={{ fontFamily: FONT_BRIER, fontSize: "0.65rem", color: ACCENT, letterSpacing: "0.1em" }}>
+            {project.id}
+          </span>
+          <span style={{ fontFamily: FONT_BRIER, fontSize: "0.95rem", fontWeight: 900, letterSpacing: "-0.02em", textTransform: "uppercase", color: textPrimary }}>
+            {project.name}
+          </span>
+        </div>
+      )}
+
       {/* Fade-in entry: meta + first content block */}
       <m.div
         initial={{ opacity: 0, y: 28 }}
@@ -1089,10 +1119,9 @@ export function CaseStudy({ project }: { project: Project }) {
         style={{
           position:      "relative",
           zIndex:        1,
-          /* grid+timeline projects (FG, Personal) put SocialGrid in Block B outside
-             this div — clamp minHeight to "auto" so there is no blank 100vh gap
-             between description and cards. Video projects keep 100vh. */
-          minHeight:     (hasTimeline && project.layout === "grid9x16") ? "auto" : "100vh",
+          /* On mobile the strip determines height; on desktop keep 100vh for
+             video projects and auto for dual grid+timeline projects. */
+          minHeight:     isMobile ? "auto" : (hasTimeline && project.layout === "grid9x16") ? "auto" : "100vh",
           display:       "flex",
           flexDirection: "column",
         }}
@@ -1116,30 +1145,28 @@ export function CaseStudy({ project }: { project: Project }) {
 
         {/* Content fills remaining viewport height */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: project.layout === "grid9x16" ? "visible" : "hidden" }}>
-          {project.layout === "video16x9" && (
-            /* No explicit background — section bg shows through. paddingBottom: 0 when
-               a timeline follows immediately to avoid a visible gap between the two blocks. */
+          {/* Desktop: 16×9 fullscreen video */}
+          {!isMobile && project.layout === "video16x9" && (
             <div style={{ paddingTop: "clamp(3rem, 6vh, 5rem)", paddingBottom: hasTimeline ? 0 : "clamp(1.5rem, 3vh, 2.5rem)" }}>
               <FullscreenVideo project={project} />
             </div>
           )}
-          {/* Pure grid layouts (no timeline): social grid renders here inline.
-              Dual-layout (grid + timeline): social grid renders after the timeline below,
-              so the order is: header → timeline (Block A) → social grid (Block B). */}
-          {project.layout === "grid9x16" && !hasTimeline && (project.gridCount ?? 1) > 0 && (
+          {/* Desktop: pure grid layout (no timeline) */}
+          {!isMobile && project.layout === "grid9x16" && !hasTimeline && (project.gridCount ?? 1) > 0 && (
             <SocialGrid project={project} />
           )}
+          {/* Mobile: unified horizontal swipe strip for all media types */}
+          {isMobile && <MobileProjectStrip project={project} />}
         </div>
       </m.div>
 
-      {/* Block B — Social grid for dual-layout projects (grid9x16 + timeline).
-          Renders before the timeline so the section order is: header → cards → panels. */}
-      {project.layout === "grid9x16" && hasTimeline && (project.gridCount ?? 1) > 0 && (
+      {/* Desktop Block B — Social grid for dual-layout projects (grid9x16 + timeline) */}
+      {!isMobile && project.layout === "grid9x16" && hasTimeline && (project.gridCount ?? 1) > 0 && (
         <SocialGrid project={project} />
       )}
 
-      {/* Block A — Horizontal timeline (after social grid for dual-layout projects) */}
-      {hasTimeline && <HorizontalTimeline project={project} />}
+      {/* Desktop Block A — Horizontal timeline */}
+      {!isMobile && hasTimeline && <HorizontalTimeline project={project} />}
     </section>
   );
 }
