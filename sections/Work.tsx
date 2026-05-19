@@ -1035,7 +1035,8 @@ export function HorizontalTimeline({ project }: { project: Project }) {
               key={i}
               style={{
                 flexShrink:   0,
-                width:        panel.w,
+                width:        panel.h ? "auto" : panel.w,
+                height:       panel.h,
                 borderRadius: 2,
               }}
             >
@@ -1045,7 +1046,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
                 alt=""
                 loading="eager"
                 decoding="async"
-                style={{ display: "block", width: "100%", height: "auto" }}
+                style={{ display: "block", width: panel.h ? "auto" : "100%", height: panel.h ? "100%" : "auto" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             </div>
