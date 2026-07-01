@@ -137,7 +137,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
           transition={{ duration: 0.15 }}
           style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.35rem, 2.3vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1 }}
         >
-          {project.id}
+          {project.displayId ?? project.id}
         </m.span>
       </m.div>
 
@@ -314,7 +314,7 @@ function OverviewCard({
       whileHover={canHover ? { scale: 1.03, transition: { duration: 0.2, ease: "easeOut" } } : undefined}
     >
       <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", fontFamily: FONT_BRIER, fontSize: "0.6rem", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em" }}>
-        {project.id}
+        {project.displayId ?? project.id}
       </div>
       <div style={{ position: "relative", padding: "0.75rem", width: "100%" }}>
         <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.75rem, 1.1vw, 1.1rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "-0.01em", lineHeight: 1.1 }}>
@@ -1079,7 +1079,7 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
       {/* Left: number + name + tagline */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(1rem, 2vw, 2.5rem)", minWidth: 0 }}>
         <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.65rem, 0.9vw, 0.85rem)", color: ACCENT, letterSpacing: "0.1em", flexShrink: 0, paddingTop: "0.2em" }}>
-          {project.id}
+          {project.displayId ?? project.id}
         </span>
         <div>
           <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: textPrimary }}>
@@ -1144,7 +1144,7 @@ export function CaseStudy({ project }: { project: Project }) {
           }}
         >
           <span style={{ fontFamily: FONT_BRIER, fontSize: "0.65rem", color: ACCENT, letterSpacing: "0.1em" }}>
-            {project.id}
+            {project.displayId ?? project.id}
           </span>
           <span style={{ fontFamily: FONT_BRIER, fontSize: "0.95rem", fontWeight: 900, letterSpacing: "-0.02em", textTransform: "uppercase", color: textPrimary }}>
             {project.name}

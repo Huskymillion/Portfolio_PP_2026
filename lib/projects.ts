@@ -1,7 +1,8 @@
 export type Layout = "video16x9" | "grid9x16" | "timeline";
 
 export interface Project {
-  id:           string;
+  id:           string;      // R2 storage key — never changes once media is uploaded
+  displayId?:   string;      // UI-only number label; falls back to id if omitted
   slug:         string;
   name:         string;
   type:         string;
@@ -33,21 +34,28 @@ export const PROJECTS: Project[] = [
     description: "Ongoing content production across video, motion and photography for one of Zurich's most distinct creative studios.",
   },
   {
-    id: "03", slug: "ewz", name: "ewz", type: "energy provider",
+    id: "03b", displayId: "03", slug: "riders-rights", name: "riders rights", type: "labour rights campaign",
+    services: "concept + strategy + campaign",
+    layout: "video16x9", accent: "#b51c1c",
+    tagline:     "when the order becomes the message",
+    description: "Trade union Syndicom registered a Zurich restaurant on Uber Eats as a Trojan horse. Activists and customers placed real orders to draw isolated couriers to pre-set pickup points — where labour rights experts used these genuine encounters to inform riders about bogus self-employment and direct them to a multilingual campaign website.",
+  },
+  {
+    id: "03", displayId: "04", slug: "ewz", name: "ewz", type: "energy provider",
     services: "video + motion + edit",
     layout: "grid9x16", accent: "#0f3460",
     tagline:     "energy for the city of zurich",
     description: "Video and motion work translating ewz's commitment to sustainable urban energy into compelling visual storytelling.",
   },
   {
-    id: "04", slug: "sfv", name: "sfv", type: "Swiss Football Association",
+    id: "04", displayId: "05", slug: "sfv", name: "sfv", type: "Swiss Football Association",
     services: "video + motion + concept + edit",
     layout: "grid9x16", accent: "#e94560",
     tagline:     "football is more than a game",
     description: "Campaign and editorial video production for the Swiss Football Association — capturing the emotion and culture of the sport.",
   },
   {
-    id: "05", slug: "schweizer-paraplegiker-stiftung", name: "schweizer paraplegiker stiftung", type: "healthcare",
+    id: "05", displayId: "06", slug: "schweizer-paraplegiker-stiftung", name: "schweizer paraplegiker stiftung", type: "healthcare",
     services: "video + concept + motion + edit",
     layout: "video16x9", extra: "timeline", accent: "#533483",
     tagline:     "support. dignity. independence.",
@@ -56,7 +64,7 @@ export const PROJECTS: Project[] = [
     darkSection: true,
   },
   {
-    id: "06", slug: "kapo-bern", name: "kapo bern", type: "cantonal police",
+    id: "06", displayId: "07", slug: "kapo-bern", name: "kapo bern", type: "cantonal police",
     services: "video + photography + motion + edit",
     layout: "video16x9", extra: "timeline", accent: "#0b3d91",
     tagline:     "serving and protecting the canton",
@@ -64,7 +72,7 @@ export const PROJECTS: Project[] = [
     panelCount:  4,
   },
   {
-    id: "07", slug: "kfh", name: "kfh", type: "health care",
+    id: "07", displayId: "08", slug: "kfh", name: "kfh", type: "health care",
     services: "photography + concept",
     layout: "video16x9", extra: "timeline", accent: "#0a0a0a",
     tagline:     "health care, humanised",
@@ -73,7 +81,7 @@ export const PROJECTS: Project[] = [
     darkSection: true,
   },
   {
-    id: "08", slug: "mawave", name: "mawave", type: "social first agency",
+    id: "08", displayId: "09", slug: "mawave", name: "mawave", type: "social first agency",
     services: "video + motion + concept + photography + edit + design",
     layout: "grid9x16", accent: "#3d0000",
     tagline:     "we translate brands to social media",
@@ -90,12 +98,12 @@ export const PROJECTS: Project[] = [
      * After adding files: update panelCount / gridCount to the actual file count
      * so the components render the right number of frames.
      */
-    id: "09", slug: "personal", name: "personal", type: "analog photos + private projects",
+    id: "09", displayId: "10", slug: "personal", name: "personal", type: "analog photos + private projects",
     services: "photography + analog + personal",
     layout: "grid9x16", extra: "timeline", accent: "#2c2c2c",
     tagline:     "analog moments + personal work",
     description: "A collection of analog photography and personal creative projects — work made for the love of it.",
-    panelCount:  5,  // panel-01…panel-05 in public/projects/09/
-    gridCount:   5,  // grid-01…grid-05.mp4 in public/projects/09/
+    panelCount:  5,  // panel-01…panel-05 in projects/09/
+    gridCount:   5,  // grid-01…grid-05.mp4 in projects/09/
   },
 ];
