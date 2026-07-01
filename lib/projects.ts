@@ -35,10 +35,10 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "03b", displayId: "03", slug: "riders-rights", name: "riders rights", type: "labour rights campaign",
-    services: "concept + strategy + campaign",
+    services: "director + dop + editor",
     layout: "video16x9", accent: "#b51c1c",
     tagline:     "when the order becomes the message",
-    description: "Trade union Syndicom registered a Zurich restaurant on Uber Eats as a Trojan horse. Activists and customers placed real orders to draw isolated couriers to pre-set pickup points — where labour rights experts used these genuine encounters to inform riders about bogus self-employment and direct them to a multilingual campaign website.",
+    description: "Freundliche Grüsse registered a Zurich restaurant for Trade union Syndicom on Uber Eats as a Trojan horse. Activists and customers placed real orders to draw isolated couriers to pre-set pickup points where labour rights experts used these genuine encounters to inform riders about bogus self-employment and direct them to a multilingual campaign website.",
   },
   {
     id: "03", displayId: "04", slug: "ewz", name: "ewz", type: "energy provider",
