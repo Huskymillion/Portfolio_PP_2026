@@ -3,6 +3,7 @@ import { Hero }                  from "@/sections/Hero";
 import { About }                 from "@/sections/About";
 import { WorkIndex, CaseStudy }  from "@/sections/Work";
 import { getProjectsFromCMS }    from "@/lib/cms-projects";
+import { HashScroll }            from "@/components/HashScroll";
 
 /* Below-fold sections — loaded in a separate JS chunk to reduce initial bundle size */
 const ExtendedAbout = dynamic(() => import("@/sections/ExtendedAbout").then(m => ({ default: m.ExtendedAbout })));
@@ -14,6 +15,7 @@ export default async function Home() {
 
   return (
     <main>
+      <HashScroll />
       {/* ── 1. Hero (200vh wrapper, splits on scroll) ── */}
       <Hero />
 
