@@ -325,7 +325,7 @@ export function MobileProjectStrip({ project }: { project: Project }) {
         fontSize:      "0.625rem",
         letterSpacing: "0.12em",
         textTransform: "uppercase",
-        color:         "#666",
+        color:         project.darkSection ? "#999" : "#666",   // ≥ 4.5:1 on black / on #fafafa
         paddingLeft:   "5vw",
         marginBottom:  "0.75rem",
       }}>
