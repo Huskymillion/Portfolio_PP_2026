@@ -53,9 +53,9 @@ export default function RootLayout({
         {/* Above-the-fold fonts: Brier Bold (hero title) + Mona Sans (body) */}
         <link rel="preload" href="/fonts/Brier-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/MonaSans-Variable.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        {/* Preconnect to Cloudflare R2 CDN to eliminate DNS + TLS overhead for media */}
-        <link rel="preconnect" href="https://pub-0138911b93ac4d2288711fb008e069c8.r2.dev" />
-        <link rel="dns-prefetch" href="https://pub-0138911b93ac4d2288711fb008e069c8.r2.dev" />
+        {/* Preconnect to the R2 media domain to eliminate DNS + TLS overhead for media */}
+        <link rel="preconnect" href="https://media.huskymillion.com" />
+        <link rel="dns-prefetch" href="https://media.huskymillion.com" />
       </head>
       <body>
         <SmoothScrollProvider>

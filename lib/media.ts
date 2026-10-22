@@ -21,8 +21,7 @@
  * 3. Leave "" to fall through to R2 (preferred for all new uploads).
  */
 
-export const R2_BASE =
-  "https://pub-0138911b93ac4d2288711fb008e069c8.r2.dev";
+export const R2_BASE = "https://media.huskymillion.com";
 
 /** Resolve any path to a full URL. Absolute URLs are returned unchanged. */
 export function mediaUrl(path: string): string {

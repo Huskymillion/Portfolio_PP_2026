@@ -6,7 +6,7 @@ backend:
   auth_endpoint: api/auth
 
 media_folder: uploads
-public_folder: https://pub-0138911b93ac4d2288711fb008e069c8.r2.dev/uploads
+public_folder: https://media.huskymillion.com/uploads
 
 collections:
   - name: projects

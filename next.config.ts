@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Cloudflare R2 public bucket — primary media CDN
+      // Cloudflare R2 custom domain — primary media CDN
+      { protocol: "https", hostname: "media.huskymillion.com", pathname: "/**" },
+      // Cloudflare R2 public bucket (legacy r2.dev URL, kept for now)
       {
         protocol: "https",
         hostname: "pub-0138911b93ac4d2288711fb008e069c8.r2.dev",
