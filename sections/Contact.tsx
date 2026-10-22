@@ -125,7 +125,8 @@ function Link({ href, children }: { href: string; children: ReactNode }) {
         marginBlock:    -16,
       }}
     >
-      <span style={{ borderBottom: "1px solid currentColor", paddingBottom: "0.05em" }}>
+      {/* block: underline + padding count toward the link's height exactly as before */}
+      <span style={{ display: "block", borderBottom: "1px solid currentColor", paddingBottom: "0.05em" }}>
         {children}
       </span>
     </a>
