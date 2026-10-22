@@ -212,7 +212,7 @@ export function Contact() {
         <IconNoWash />
         <Sep />
         <Link href="mailto:pascal@kottur.de">
-          ℗ascal@kottur.de
+          pascal@kottur.de
         </Link>
         <Sep />
         <span style={{ fontFamily: FONT_BRIER, fontStyle: "italic" }}>&ldquo;&rdquo;</span>
