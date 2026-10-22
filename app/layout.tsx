@@ -18,27 +18,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://pascalpfohl.com"),
-  title: "Pascal Pfohl — Creative Content Producer",
-  description:
-    "Pascal Pfohl is a creative content producer based in Munich, specialising in advertising storytelling, brand campaigns, video, motion, and photography.",
-  keywords: ["creative content producer", "content production", "advertising", "video", "motion", "photography", "Munich", "Pascal Pfohl"],
+  metadataBase: new URL("https://www.huskymillion.com"),
+  title: "Pascal Pfohl — Art Direction for Moving Image, Content Production & Motion Design, Zürich",
+  description: "Portfolio of Pascal Pfohl, Zürich: moving image from idea to final edit. Visual concept, direction, camera, edit and motion design for campaigns, social and brands.",
+  keywords: ["Pascal Pfohl", "art direction moving image", "Art Director Bewegtbild", "motion design", "content production", "video production", "Zürich"],
   authors: [{ name: "Pascal Pfohl" }],
+  alternates: { canonical: "/" },
   openGraph: {
-    title:       "Pascal Pfohl — Creative Content Producer",
-    description: "Creative content production, video & motion — Munich.",
-    url:         "https://pascalpfohl.com",
-    siteName:    "Pascal Pfohl",
-    locale:      "en_US",
-    type:        "website",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Pascal Pfohl portfolio" }],
+    title: "Pascal Pfohl — moving image from idea to final edit",
+    description: "Art direction for moving image, content production + motion design. Zürich.",
+    url: "https://www.huskymillion.com", siteName: "Pascal Pfohl — huskymillion",
+    locale: "en_US", type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Pascal Pfohl — portfolio" }],
   },
-  twitter: {
-    card:        "summary_large_image",
-    title:       "Pascal Pfohl — Creative Content Producer",
-    description: "Creative content production, video & motion — Munich.",
-    images:      ["/og-image.jpg"],
-  },
+  twitter: { card: "summary_large_image", title: "Pascal Pfohl — moving image from idea to final edit",
+    description: "Art direction for moving image, content production + motion design. Zürich.", images: ["/og-image.jpg"] },
   icons: {
     icon:  { url: "/favicon.svg", type: "image/svg+xml" },
     apple: "/favicon.svg",
