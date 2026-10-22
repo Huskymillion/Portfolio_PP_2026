@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>[]{}|^~";
 
@@ -59,7 +59,7 @@ export function ScrambleText({ text, isActive, className, style }: Props) {
   const shouldBlur = mounted && !revealed;
 
   return (
-    <motion.span
+    <m.span
       className={className}
       style={{ display: "block", cursor: "default", ...style }}
       animate={{ filter: shouldBlur ? "blur(4px)" : "blur(0px)", opacity: mounted ? 1 : 0 }}
@@ -69,6 +69,6 @@ export function ScrambleText({ text, isActive, className, style }: Props) {
     >
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">{display}</span>
-    </motion.span>
+    </m.span>
   );
 }
