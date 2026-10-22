@@ -113,6 +113,7 @@ function Link({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a
       href={href}
+      className="contact-link"
       target={href.startsWith("http") ? "_blank" : undefined}
       rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
       style={{

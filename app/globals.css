@@ -301,3 +301,12 @@ button:focus-visible,
     display: none !important;
   }
 }
+
+/* Contact links have an enlarged (44 px) tap area — keep the focus ring tight around the text */
+.contact-link:focus-visible {
+  outline: none;
+}
+.contact-link:focus-visible > span {
+  outline: 2px solid #E0115F;
+  outline-offset: 3px;
+}
