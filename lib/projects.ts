@@ -1,7 +1,7 @@
 export type Layout = "video16x9" | "grid9x16" | "timeline";
 
 export interface Project {
-  id:           string;      // anchor id; media folder = slug
+  id:           string;      // internal id (displayId fallback) — anchor + media folder = slug
   displayId?:   string;      // UI-only number label; falls back to id if omitted
   slug:         string;
   name:         string;
