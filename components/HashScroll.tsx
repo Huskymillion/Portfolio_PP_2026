@@ -32,7 +32,13 @@ export function HashScroll() {
     if (!el) return;
     // Wait for layout to settle (fonts, images, sticky sections)
     const t = setTimeout(() => {
-      lenis.scrollTo(el as HTMLElement, { duration: 1.4 });
+      lenis.scrollTo(el as HTMLElement, {
+        duration: 1.4,
+        // Media above the target can load mid-scroll and push it down — correct once
+        onComplete: () => {
+          if (Math.abs(el.getBoundingClientRect().top) > 2) lenis.scrollTo(el as HTMLElement, { duration: 0.6 });
+        },
+      });
     }, 600);
     return () => clearTimeout(t);
   }, [lenis]);
