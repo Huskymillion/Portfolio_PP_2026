@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { m, useScroll, useTransform } from "framer-motion";
 import { ScrambleText } from "@/components/ScrambleText";
+import { useMediaQuery } from "@/lib/hooks";
 
 /* ─── Copy ─────────────────────────────────────── */
 
@@ -56,11 +57,10 @@ interface HeroInnerProps {
 }
 
 function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRef }: HeroInnerProps) {
-  const vw = typeof window !== "undefined" ? window.innerWidth  : 1280;
 
   /* Narrow screens: no room beside the title — left column sits above it,
      right column below the subline (rendered inside the subline block). */
-  const narrow  = vw < 768;
+  const narrow  = useMediaQuery("(max-width: 767px)");   // false during hydration → no stale server styles
   const stacked = pos.ready && narrow;
 
   const leftStyle: React.CSSProperties = stacked
