@@ -24,10 +24,17 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Public folder assets (favicons, og-image, etc.)
-        source: "/:path(.*\\.(?:svg|ico|png|jpg|jpeg|webp|woff2|woff|ttf|otf))",
+        // Self-hosted fonts — file names change whenever a font changes
+        source: "/fonts/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Other public assets (favicons, og-image, …) can be replaced under the same name
+        source: "/:path(.*\\.(?:svg|ico|png|jpg|jpeg|webp))",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, must-revalidate" },
         ],
       },
     ];
