@@ -206,8 +206,8 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
     if (p) setMobileActive(p);
   }, []);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(`case-${id}`)?.scrollIntoView({ behavior: "smooth" });
+  const scrollTo = (slug: string) => {
+    document.getElementById(`case-${slug}`)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -252,7 +252,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
                 onHover={isMobile ? () => {} : setHovered}
                 onLeave={isMobile ? () => {} : () => setHovered(null)}
                 onMouseMove={handleMouseMove}
-                onClick={() => scrollTo(p.id)}
+                onClick={() => scrollTo(p.slug)}
                 onInView={isMobile ? handleInView : undefined}
               />
             </m.div>
@@ -288,7 +288,7 @@ function OverviewCard({
 
   const canHover = useCanHover();
   const scrollTo = () => {
-    document.getElementById(`case-${project.id}`)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(`case-${project.slug}`)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -1118,7 +1118,7 @@ export function CaseStudy({ project }: { project: Project }) {
 
   return (
     <section
-      id={`case-${project.id}`}
+      id={`case-${project.slug}`}
       style={{
         background: sectionBg,
         position:   "relative",
