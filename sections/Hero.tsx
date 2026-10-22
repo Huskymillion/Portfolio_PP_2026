@@ -18,10 +18,12 @@ interface TitlePos {
   titleRight:  number;
   titleTop:    number;
   helloBottom: number;
+  boxW:        number;   // hero box size — all positions are relative to the box,
+  boxH:        number;   // not the viewport (iOS: 100vh ≠ innerHeight)
   ready:       boolean;
 }
 
-const DEFAULT_POS: TitlePos = { titleLeft: -1, titleRight: -1, titleTop: -1, helloBottom: -1, ready: false };
+const DEFAULT_POS: TitlePos = { titleLeft: -1, titleRight: -1, titleTop: -1, helloBottom: -1, boxW: -1, boxH: -1, ready: false };
 
 /* ─── Cycling scramble controller ───────────────── */
 
@@ -54,7 +56,6 @@ interface HeroInnerProps {
 }
 
 function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRef }: HeroInnerProps) {
-  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const vw = typeof window !== "undefined" ? window.innerWidth  : 1280;
 
   /* Narrow screens: no room beside the title — left column sits above it,
@@ -62,13 +63,14 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
   const stacked = pos.ready && vw < 768;
 
   const leftStyle: React.CSSProperties = stacked
-    ? { position: "absolute", left: pos.titleLeft, bottom: vh - pos.titleTop + 16, display: "flex", flexDirection: "column", textAlign: "left" }
+    /* bottom edge 16 px above the measured title top; grows upward, never over the title */
+    ? { position: "absolute", left: pos.titleLeft, top: pos.titleTop - 16, transform: "translateY(-100%)", display: "flex", flexDirection: "column", textAlign: "left" }
     : pos.ready
-    ? { position: "absolute", right: vw - pos.titleLeft + 16, top: pos.titleTop, display: "flex", flexDirection: "column", textAlign: "right" }
+    ? { position: "absolute", right: pos.boxW - pos.titleLeft + 16, top: pos.titleTop, display: "flex", flexDirection: "column", textAlign: "right" }
     : { position: "absolute", left: "clamp(1.5rem, 4vw, 5rem)", top: "clamp(2rem, 6vh, 5rem)", display: "flex", flexDirection: "column", textAlign: "right" };
 
   const rightStyle: React.CSSProperties = pos.ready
-    ? { position: "absolute", left: pos.titleRight + 16, bottom: vh - pos.helloBottom, display: "flex", flexDirection: "column-reverse", textAlign: "left" }
+    ? { position: "absolute", left: pos.titleRight + 16, bottom: pos.boxH - pos.helloBottom, display: "flex", flexDirection: "column-reverse", textAlign: "left" }
     : { position: "absolute", right: "clamp(1.5rem, 4vw, 5rem)", bottom: "clamp(2rem, 6vh, 5rem)", display: "flex", flexDirection: "column-reverse", textAlign: "left" };
 
   const colStyle: React.CSSProperties = {
@@ -168,7 +170,8 @@ export function Hero() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /*
-   * Measure title bounds for column positioning.
+   * Measure title bounds for column positioning — relative to the hero box
+   * (the title's offsetParent), so transforms and iOS toolbar height don't matter.
    *
    * FIX 2 — Scroll-jump removed:
    * The sticky container is always at viewport-top while within the hero scroll
@@ -178,21 +181,29 @@ export function Hero() {
    */
   useEffect(() => {
     const measure = () => {
-      if (!titleRef.current || !helloRef.current) return;
+      const box = titleRef.current?.offsetParent;
+      if (!titleRef.current || !helloRef.current || !box) return;
+      const b = box.getBoundingClientRect();
       const t = titleRef.current.getBoundingClientRect();
       const h = helloRef.current.getBoundingClientRect();
       setPos({
-        titleLeft:   t.left,
-        titleRight:  t.right,
-        titleTop:    t.top,
-        helloBottom: h.bottom,
+        titleLeft:   t.left   - b.left,
+        titleRight:  t.right  - b.left,
+        titleTop:    t.top    - b.top,
+        helloBottom: h.bottom - b.top,
+        boxW:        b.width,
+        boxH:        b.height,
         ready:       true,
       });
     };
     measure();
     document.fonts.ready.then(measure);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
   }, []);
 
   /* Continuous cycling scramble */
