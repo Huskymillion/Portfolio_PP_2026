@@ -322,10 +322,10 @@ export function MobileProjectStrip({ project }: { project: Project }) {
       {/* Swipe hint */}
       <div style={{
         fontFamily:    FONT_BRIER,
-        fontSize:      "0.55rem",
+        fontSize:      "0.625rem",
         letterSpacing: "0.12em",
         textTransform: "uppercase",
-        color:         "#888",
+        color:         "#666",
         paddingLeft:   "5vw",
         marginBottom:  "0.75rem",
       }}>
