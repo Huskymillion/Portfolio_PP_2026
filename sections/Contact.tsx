@@ -118,11 +118,16 @@ function Link({ href, children }: { href: string; children: ReactNode }) {
       style={{
         color:          "inherit",
         textDecoration: "none",
-        borderBottom:   "1px solid currentColor",
-        paddingBottom:  "0.05em",
+        /* ≥ 44 px tap target without moving anything: padding grows the hit area,
+           the equal negative margin keeps the layout; the underline sits on the span */
+        display:        "inline-block",
+        paddingBlock:   16,
+        marginBlock:    -16,
       }}
     >
-      {children}
+      <span style={{ borderBottom: "1px solid currentColor", paddingBottom: "0.05em" }}>
+        {children}
+      </span>
     </a>
   );
 }
