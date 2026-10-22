@@ -1,0 +1,22 @@
+{
+  "kapo-bern": {
+    "duration": "PT10S",
+    "uploadDate": "2026-10-22"
+  },
+  "kottur": {
+    "duration": "PT30S",
+    "uploadDate": "2026-10-22"
+  },
+  "riders-rights": {
+    "duration": "PT2M9S",
+    "uploadDate": "2026-10-22"
+  },
+  "schweizer-paraplegiker-stiftung": {
+    "duration": "PT2M8S",
+    "uploadDate": "2026-10-22"
+  },
+  "woz": {
+    "duration": "PT1M7S",
+    "uploadDate": "2026-10-22"
+  }
+}
