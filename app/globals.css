@@ -282,3 +282,14 @@ button {
 .strip-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* ─────────────────────────────────────────────
+   Keyboard focus — visible ring on interactive elements
+   ───────────────────────────────────────────── */
+
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #E0115F;
+  outline-offset: 3px;
+}
