@@ -57,7 +57,13 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const vw = typeof window !== "undefined" ? window.innerWidth  : 1280;
 
-  const leftStyle: React.CSSProperties = pos.ready
+  /* Narrow screens: no room beside the title — left column sits above it,
+     right column below the subline (rendered inside the subline block). */
+  const stacked = pos.ready && vw < 768;
+
+  const leftStyle: React.CSSProperties = stacked
+    ? { position: "absolute", left: pos.titleLeft, bottom: vh - pos.titleTop + 16, display: "flex", flexDirection: "column", textAlign: "left" }
+    : pos.ready
     ? { position: "absolute", right: vw - pos.titleLeft + 16, top: pos.titleTop, display: "flex", flexDirection: "column", textAlign: "right" }
     : { position: "absolute", left: "clamp(1.5rem, 4vw, 5rem)", top: "clamp(2rem, 6vh, 5rem)", display: "flex", flexDirection: "column", textAlign: "right" };
 
@@ -84,11 +90,13 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
       </div>
 
       {/* Right column — bottom-anchored, words grow upward (column-reverse) */}
-      <div style={{ ...rightStyle, ...colStyle }}>
-        {RIGHT_WORDS.map((w, i) => (
-          <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
-        ))}
-      </div>
+      {!stacked && (
+        <div style={{ ...rightStyle, ...colStyle }}>
+          {RIGHT_WORDS.map((w, i) => (
+            <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
+          ))}
+        </div>
+      )}
 
       {/* Main title */}
       <div
@@ -104,28 +112,43 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
       </div>
 
       {/* Subline — centred directly below the title block */}
-      <p
+      <div
         style={{
           position:      "absolute",
           top:           pos.ready ? pos.helloBottom + 16 : "calc(50% + 0.84 * clamp(4.5rem, 13.5vw, 15rem) + 1rem)",
           left:          "50%",
           transform:     "translateX(-50%)",
           width:         "max-content",
-          /* Narrow screens: the word columns reach below the title — keep the subline within the title width */
-          maxWidth:      pos.ready && vw < 768 ? Math.min(vw * 0.9, pos.titleRight - pos.titleLeft) : "90vw",
-          margin:        0,
-          textAlign:     "center",
-          fontFamily:    "var(--font-mono)",
-          fontSize:      "clamp(0.55rem, 0.85vw, 0.72rem)",
-          lineHeight:    1.6,
-          letterSpacing: "0.04em",
-          color:         "rgba(255,255,255,0.6)",
-          textTransform: "lowercase",
+          maxWidth:      "90vw",
+          display:       "flex",
+          flexDirection: "column",
+          alignItems:    "center",
           pointerEvents: "none",
         }}
       >
-        pascal pfohl — art direction for moving image, content production + motion design — zürich
-      </p>
+        <p
+          style={{
+            margin:        0,
+            textAlign:     "center",
+            fontFamily:    "var(--font-mono)",
+            fontSize:      "clamp(0.55rem, 0.85vw, 0.72rem)",
+            lineHeight:    1.6,
+            letterSpacing: "0.04em",
+            color:         "rgba(255,255,255,0.6)",
+            textTransform: "lowercase",
+            pointerEvents: "none",
+          }}
+        >
+          pascal pfohl — art direction for moving image, content production + motion design — zürich
+        </p>
+        {stacked && (
+          <div style={{ ...colStyle, display: "flex", flexDirection: "column-reverse", textAlign: "right", alignSelf: "flex-end", marginTop: 16 }}>
+            {RIGHT_WORDS.map((w, i) => (
+              <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
+            ))}
+          </div>
+        )}
+      </div>
 
     </div>
   );

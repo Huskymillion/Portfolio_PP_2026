@@ -20,8 +20,8 @@ export type { Project, Layout };
 
 /* ─── Thumbnail hover card ──────────────────────── */
 
-function Thumbnail({ project, visible, x, y, mobile = false }: {
-  project: Project | null; visible: boolean; x: number; y: number; mobile?: boolean;
+function Thumbnail({ project, visible, x, y }: {
+  project: Project | null; visible: boolean; x: number; y: number;
 }) {
   return (
     <AnimatePresence>
@@ -32,19 +32,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
           animate={{ opacity: 1,  scale: 1    }}
           exit={{    opacity: 0,  scale: 0.88 }}
           transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          style={mobile ? {
-            /* mobile: centred in the right half of the screen, below the list */
-            position:       "fixed",
-            right:          "clamp(1rem, 5vw, 2rem)",
-            bottom:         "clamp(5rem, 12vh, 8rem)",
-            width:          120,
-            height:         86,
-            overflow:       "hidden",
-            borderRadius:   4,
-            background:     project.accent,
-            pointerEvents:  "none",
-            zIndex:         200,
-          } : {
+          style={{
             position:       "fixed",
             left:           x + 20,
             top:            y - 60,
@@ -74,34 +62,19 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
 
 /* ─── Work Index row ────────────────────────────── */
 
-function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: {
+function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
   project:     Project;
   onHover:     (p: Project) => void;
   onLeave:     () => void;
   onMouseMove: (x: number, y: number) => void;
   onClick:     () => void;
-  onInView?:   (p: Project | null) => void;
 }) {
   const [active, setActive] = useState(false);
   const canHover = useCanHover();
-  const rowRef = useRef<HTMLButtonElement>(null);
-
-  /* Mobile scroll-triggered thumbnail — fires when row is ≥ 50 % visible */
-  useEffect(() => {
-    if (!onInView) return;
-    const el = rowRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => onInView(entry.isIntersecting ? project : null),
-      { threshold: 0.5 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [onInView, project]);
+  const isMobile = useIsMobile();
 
   return (
     <m.button
-      ref={rowRef}
       onClick={onClick}
       onPointerEnter={(e) => { if (e.pointerType !== "mouse") return; setActive(true);  onHover(project); }}
       onPointerLeave={(e) => { if (e.pointerType !== "mouse") return; setActive(false); onLeave(); }}
@@ -156,21 +129,31 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick, onInView }: 
         <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", marginTop: "0.3rem", letterSpacing: "0.04em", textTransform: "lowercase" }}>
           {project.type}
         </div>
+        {/* Mobile: services stacked under type, full width */}
+        {isMobile && (
+          <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.6rem, 0.9vw, 0.8rem)", color: ACCENT, letterSpacing: "0.03em", textTransform: "lowercase", marginTop: "0.2rem" }}>
+            {project.services}
+          </div>
+        )}
       </div>
 
       {/* Services */}
-      <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.6rem, 0.9vw, 0.8rem)", color: ACCENT, letterSpacing: "0.03em", textTransform: "lowercase", textAlign: "right", flexShrink: 0, maxWidth: "35%" }}>
-        {project.services}
-      </div>
+      {!isMobile && (
+        <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.6rem, 0.9vw, 0.8rem)", color: ACCENT, letterSpacing: "0.03em", textTransform: "lowercase", textAlign: "right", flexShrink: 0, maxWidth: "35%" }}>
+          {project.services}
+        </div>
+      )}
 
-      {/* '+' reveal */}
-      <m.span
-        animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.5, x: active ? 0 : -6 }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.1rem, 1.8vw, 1.6rem)", fontWeight: 900, color: ACCENT, flexShrink: 0, width: "1.6rem", textAlign: "center", lineHeight: 1, display: "block" }}
-      >
-        +
-      </m.span>
+      {/* '+' reveal — mouse hover only, so not on mobile (frees the row width) */}
+      {!isMobile && (
+        <m.span
+          animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.5, x: active ? 0 : -6 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.1rem, 1.8vw, 1.6rem)", fontWeight: 900, color: ACCENT, flexShrink: 0, width: "1.6rem", textAlign: "center", lineHeight: 1, display: "block" }}
+        >
+          +
+        </m.span>
+      )}
     </m.button>
   );
 }
@@ -182,31 +165,10 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
   const isMobile   = useIsMobile();
   const [hovered,       setHovered]  = useState<Project | null>(null);
   const [cursorPos,     setCursor]   = useState({ x: 0, y: 0 });
-  const [mobileActive,  setMobileActive] = useState<Project | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   const handleMouseMove = useCallback((x: number, y: number) => {
     setCursor({ x, y });
-  }, []);
-
-  /* Clear mobile thumbnail when the entire Work section leaves the viewport —
-     prevents the last-tapped thumbnail persisting as a sticky overlay into
-     other sections after the user scrolls past the work index. */
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (!entry.isIntersecting) setMobileActive(null); },
-      { threshold: 0.05 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  /* Mobile: show the thumbnail of whichever row most recently entered view.
-     Multiple rows can fire; last-in-wins is fine for a scroll reveal. */
-  const handleInView = useCallback((p: Project | null) => {
-    if (p) setMobileActive(p);
   }, []);
 
   const scrollTo = (slug: string) => {
@@ -223,10 +185,8 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
         padding:    "clamp(6rem, 15vh, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vh, 6rem)",
       }}
     >
-      {/* Desktop: cursor-follow thumbnail */}
+      {/* Desktop: cursor-follow thumbnail (none on mobile — full-width rows leave no free space for it) */}
       {!isMobile && <Thumbnail project={hovered} visible={!!hovered} x={cursorPos.x} y={cursorPos.y} />}
-      {/* Mobile: scroll-triggered thumbnail pinned to bottom-right */}
-      {isMobile  && <Thumbnail project={mobileActive} visible={!!mobileActive} x={0} y={0} mobile />}
 
       <div>
 
@@ -235,7 +195,9 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
           <h2 style={{ fontFamily: FONT_BRIER, fontSize: "clamp(2rem, 5vw, 5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, margin: 0 }}>
             Work
           </h2>
-          <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto" }}>
+          <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto",
+            /* Mobile: keep clear of the fixed menu button (44 px + 1rem inset + 0.5rem gap) */
+            paddingRight: isMobile ? "max(0px, calc(44px + 1.5rem - clamp(1.5rem, 5vw, 5rem)))" : 0 }}>
             Selected works spanning campaign design,<br />branding, art direction, video, motion, and more.
           </span>
         </div>
@@ -256,7 +218,6 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
                 onLeave={isMobile ? () => {} : () => setHovered(null)}
                 onMouseMove={handleMouseMove}
                 onClick={() => scrollTo(p.slug)}
-                onInView={isMobile ? handleInView : undefined}
               />
             </m.div>
           ))}
