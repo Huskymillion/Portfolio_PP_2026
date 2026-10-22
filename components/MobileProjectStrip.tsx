@@ -109,9 +109,13 @@ function VideoPanel({
   const [playing, setPlaying] = useState(false);
   const [muted,   setMuted]   = useState(true); // starts muted (required for autoPlay)
 
-  /* Respond immediately when the whole section leaves the viewport */
+  const inStripRef = useRef(false); // panel is the visible one inside the strip
+
+  /* Respond immediately when the whole section leaves the viewport — and resume
+     the visible panel when it comes back (e.g. after a hash jump past the section) */
   useEffect(() => {
-    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
+    if (forcePause)              videoRef.current?.pause();
+    else if (inStripRef.current) videoRef.current?.play().catch(() => {});
   }, [forcePause]);
 
   /* Play/pause based on how much of this panel is visible inside the strip.
@@ -124,15 +128,11 @@ function VideoPanel({
 
     const obs = new IntersectionObserver(
       ([entry]) => {
+        inStripRef.current = entry.isIntersecting;
         const video = videoRef.current;
         if (!video) return;
-        if (entry.isIntersecting && !pauseRef.current) {
-          video.play().catch(() => {});
-          setPlaying(true);
-        } else {
-          video.pause();
-          setPlaying(false);
-        }
+        if (entry.isIntersecting && !pauseRef.current) video.play().catch(() => {});
+        else                                           video.pause();
       },
       { root: strip, threshold: 0.6 },
     );
@@ -145,13 +145,27 @@ function VideoPanel({
     const video = videoRef.current;
     if (!video) return;
     video.muted = !video.muted;
-    setMuted(video.muted);
+  };
+
+  /* Tap = play / pause (keeps the current mute state; autoplay stays muted).
+     playing / muted follow the video's own events — play() may be rejected. */
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) video.play().catch(() => {});
+    else              video.pause();
   };
 
   return (
     <div
       ref={panelRef}
+      role={srcReady ? "button" : undefined}
+      tabIndex={srcReady ? 0 : undefined}
+      aria-label={srcReady ? `${playing ? "Pause" : "Play"} ${item.label ?? "video"}` : undefined}
+      onClick={togglePlay}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePlay(); } }}
       style={{
+        cursor:          "pointer",
         position:        "relative",
         flexShrink:      0,
         width:           "85vw",
@@ -171,6 +185,9 @@ function VideoPanel({
           loop
           playsInline
           preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
           style={{ display: "block", width: "100%", height: "auto", borderRadius: 8 }}
         />
       )}
@@ -179,7 +196,7 @@ function VideoPanel({
       {item.caption && (
         <>
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.7))", borderRadius: "0 0 8px 8px", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "0.75rem", left: "0.75rem", maxWidth: "calc(100% - 3.75rem)", fontFamily: FONT_MONA, fontSize: "0.6rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase", pointerEvents: "none" }}>
+          <div style={{ position: "absolute", bottom: "0.75rem", left: "0.75rem", maxWidth: "calc(100% - 3.75rem)", fontFamily: FONT_MONA, fontSize: "0.6rem", color: "#fff", letterSpacing: "0.08em", textTransform: "lowercase", pointerEvents: "none" }}>
             {item.caption}
           </div>
         </>

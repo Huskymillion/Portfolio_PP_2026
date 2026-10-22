@@ -430,7 +430,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (v) => {
       if (!videoRef.current || !ready) return;
-      if (v > 0.8 && videoRef.current.paused) { videoRef.current.play().catch(() => {}); setPaused(false); }
+      if (v > 0.8 && videoRef.current.paused) videoRef.current.play().catch(() => {});
     });
     return unsub;
   }, [scrollYProgress, ready]);
@@ -440,10 +440,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting && videoRef.current && !videoRef.current.paused) {
-        videoRef.current.pause();
-        setPaused(true);
-      }
+      if (!entry.isIntersecting && videoRef.current && !videoRef.current.paused) videoRef.current.pause();
     }, { threshold: 0.05 });
     obs.observe(el);
     return () => obs.disconnect();
@@ -462,10 +459,11 @@ export function FullscreenVideo({ project }: { project: Project }) {
 
   useEffect(() => () => { if (idleRef.current) clearTimeout(idleRef.current); }, []);
 
+  /* paused / muted state follows the video's own events — play() may be rejected by the browser */
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (videoRef.current.paused) { videoRef.current.play().catch(() => {}); setPaused(false); }
-    else                         { videoRef.current.pause(); setPaused(true); }
+    if (videoRef.current.paused) videoRef.current.play().catch(() => {});
+    else                         videoRef.current.pause();
   };
 
   const toggleMute = (e: React.MouseEvent) => {
@@ -474,7 +472,6 @@ export function FullscreenVideo({ project }: { project: Project }) {
     const nowMuted = !videoRef.current.muted;
     videoRef.current.muted = nowMuted;
     if (!nowMuted) videoRef.current.volume = 0.7; // restore audible level when unmuting
-    setMuted(nowMuted);
   };
 
   return (
@@ -501,6 +498,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
           onCanPlay={() => setReady(true)}
           onPlay={() => setPaused(false)}
           onPause={() => setPaused(true)}
+          onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
           style={{ display: "block", width: "100%", height: "auto", opacity: ready ? 1 : 0, transition: "opacity 0.5s ease" }}
         />
       )}
@@ -602,7 +600,7 @@ function MobileVideoCard({ src, poster, accent, label, caption, forcePause }: {
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
+    if (forcePause) videoRef.current?.pause();
   }, [forcePause]);
 
   const handleClick = () => {
@@ -610,10 +608,8 @@ function MobileVideoCard({ src, poster, accent, label, caption, forcePause }: {
     if (videoRef.current.paused) {
       videoRef.current.volume = 0.7;
       videoRef.current.play().catch(() => {});
-      setPlaying(true);
     } else {
       videoRef.current.pause();
-      setPlaying(false);
     }
   };
 
@@ -630,6 +626,8 @@ function MobileVideoCard({ src, poster, accent, label, caption, forcePause }: {
           poster={poster}
           aria-label={caption}
           loop playsInline preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
           style={{ display: "block", width: "100%", height: "auto" }}
         />
       )}
@@ -664,12 +662,12 @@ function SocialCard({
 }) {
   const videoRef  = useRef<HTMLVideoElement>(null);
   const isHovered = hoveredIndex === index;
-  const [muted,   setMuted]   = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [muted,   setMuted]   = useState(true);   // hover preview is always muted
+  const [playing, setPlaying] = useState(false);  // both follow the video's own events
 
   /* Pause when the grid section leaves the viewport */
   useEffect(() => {
-    if (forcePause) { videoRef.current?.pause(); setPlaying(false); }
+    if (forcePause) videoRef.current?.pause();
   }, [forcePause]);
 
   const centre   = (CARD_COUNT - 1) / 2;
@@ -678,39 +676,35 @@ function SocialCard({
   const rotation = offset * 4;
   const isDimmed = hoveredIndex !== null && !isHovered;
 
+  /* Hover = muted preview */
   const handleHover = (on: boolean) => {
     setHoveredIndex(on ? index : null);
+    const video = videoRef.current;
+    if (!video) return;
     if (on) {
-      if (videoRef.current) {
-        videoRef.current.muted  = muted;
-        videoRef.current.volume = 0.7;
-        videoRef.current.play().catch(() => {});
-        setPlaying(true);
-      }
+      video.muted = true;
+      video.play().catch(() => {});
     } else {
-      videoRef.current?.pause();
-      setPlaying(false);
+      video.pause();
     }
   };
 
+  /* Click = play with sound; a click on a card already playing with sound pauses it */
   const handleClick = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play().catch(() => {});
-      setPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setPlaying(false);
-    }
+    const video = videoRef.current;
+    if (!video) return;
+    if (!video.paused && !video.muted) { video.pause(); return; }
+    video.muted  = false;
+    video.volume = 0.7;
+    video.play().catch(() => {});
   };
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!videoRef.current) return;
-    const nowMuted = !videoRef.current.muted;
-    videoRef.current.muted = nowMuted;
-    if (!nowMuted) videoRef.current.volume = 0.7;
-    setMuted(nowMuted);
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    if (!video.muted) video.volume = 0.7;
   };
 
   const n       = String(index + 1).padStart(2, "0");
@@ -752,7 +746,10 @@ function SocialCard({
           poster={imageUrl(project.slug, `grid-${n}-thumb`)}
           aria-label={caption}
           loop playsInline preload="none"
-          muted={muted}
+          muted
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
         />
       )}
