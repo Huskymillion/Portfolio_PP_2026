@@ -9,7 +9,8 @@ import { useCanHover } from "@/lib/hooks";
 
 /* ─── Constants ─────────────────────────────────── */
 
-const ACCENT     = "#E0115F";
+const ACCENT      = "#E0115F";
+const ACCENT_DARK = "#ff2d7a";   // accent on dark case sections — #E0115F on black is only 4.41:1
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 
@@ -1035,8 +1036,9 @@ export function HorizontalTimeline({ project }: { project: Project }) {
 
 /* ─── Case Study meta strip ─────────────────────── */
 
-function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
+function CaseStudyMeta({ project, accent, textPrimary, textMuted, textSubtle }: {
   project:     Project;
+  accent:      string;
   textPrimary: string;
   textMuted:   string;
   textSubtle:  string;
@@ -1054,7 +1056,7 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
     >
       {/* Left: number + name + tagline */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(1rem, 2vw, 2.5rem)", minWidth: 0 }}>
-        <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.65rem, 0.9vw, 0.85rem)", color: ACCENT, letterSpacing: "0.1em", flexShrink: 0, paddingTop: "0.2em" }}>
+        <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(0.65rem, 0.9vw, 0.85rem)", color: accent, letterSpacing: "0.1em", flexShrink: 0, paddingTop: "0.2em" }}>
           {project.displayId ?? project.id}
         </span>
         <div>
@@ -1091,6 +1093,7 @@ export function CaseStudy({ project }: { project: Project }) {
   const textPrimary = dark ? "#fafafa"  : "#0a0a0a";
   const textMuted   = dark ? "rgba(255,255,255,0.5)"  : "#555";
   const textSubtle  = dark ? "rgba(255,255,255,0.55)" : "#6b6b6b";
+  const accent      = dark ? ACCENT_DARK : ACCENT;
 
   return (
     <article
@@ -1119,7 +1122,7 @@ export function CaseStudy({ project }: { project: Project }) {
             padding:      "0.6rem clamp(1rem, 4vw, 1.5rem)",
           }}
         >
-          <span style={{ fontFamily: FONT_BRIER, fontSize: "0.65rem", color: ACCENT, letterSpacing: "0.1em" }}>
+          <span style={{ fontFamily: FONT_BRIER, fontSize: "0.65rem", color: accent, letterSpacing: "0.1em" }}>
             {project.displayId ?? project.id}
           </span>
           <span style={{ fontFamily: FONT_BRIER, fontSize: "0.95rem", fontWeight: 900, letterSpacing: "-0.02em", textTransform: "uppercase", color: textPrimary }}>
@@ -1144,7 +1147,7 @@ export function CaseStudy({ project }: { project: Project }) {
           flexDirection: "column",
         }}
       >
-        <CaseStudyMeta project={project} textPrimary={textPrimary} textMuted={textMuted} textSubtle={textSubtle} />
+        <CaseStudyMeta project={project} accent={accent} textPrimary={textPrimary} textMuted={textMuted} textSubtle={textSubtle} />
 
         {/* Description block — sits between header and media */}
         {project.description && (
@@ -1159,7 +1162,7 @@ export function CaseStudy({ project }: { project: Project }) {
               {project.description}
             </p>
             {project.role && (
-              <p style={{ ...CREDIT_TEXT, color: ACCENT, textTransform: "lowercase", margin: "0.75rem 0 0" }}>
+              <p style={{ ...CREDIT_TEXT, color: accent, textTransform: "lowercase", margin: "0.75rem 0 0" }}>
                 role — {project.role}
               </p>
             )}
