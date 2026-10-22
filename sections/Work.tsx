@@ -1021,7 +1021,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
               <img
                 src={imageUrl(project.slug, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
-                loading="eager"
+                loading={project.slug === "kottur" ? "eager" : "lazy"}   // only the first case loads at page start
                 decoding="async"
                 style={{ display: "block", width: panel.h ? "auto" : "100%", height: panel.h ? "100%" : "auto" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
