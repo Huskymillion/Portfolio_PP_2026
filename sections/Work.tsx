@@ -96,7 +96,7 @@ function WorkRow({ project, onHover, onLeave, onMouseMove, onClick }: {
     >
       {/* Number pill */}
       <m.div
-        animate={{ background: active ? ACCENT : "transparent", borderColor: active ? ACCENT : "#0a0a0a" }}
+        animate={{ background: active ? ACCENT : "rgba(224, 17, 95, 0)", borderColor: active ? ACCENT : "#0a0a0a" }}
         transition={{ duration: 0.15 }}
         style={{
           flexShrink:     0,
@@ -198,7 +198,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
           <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto",
             /* Mobile: keep clear of the fixed menu button (44 px + 1rem inset + 0.5rem gap) */
             paddingRight: isMobile ? "max(0px, calc(44px + 1.5rem - clamp(1.5rem, 5vw, 5rem)))" : 0 }}>
-            Selected works spanning campaign design,<br />branding, art direction, video, motion, and more.
+            selected work. moving image from idea to final edit.
           </span>
         </div>
 
