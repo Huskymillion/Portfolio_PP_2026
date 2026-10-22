@@ -86,7 +86,7 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
     <div style={{ position: "relative", width: "100%", height: "100%", background: "#000", color: "#fff", overflow: "hidden" }}>
 
       {/* Left column — top-anchored, words reveal top → down */}
-      <div style={{ ...leftStyle, ...colStyle }}>
+      <div className="hero-words" style={{ ...leftStyle, ...colStyle }}>
         {LEFT_WORDS.map((w, i) => (
           <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
         ))}
@@ -94,7 +94,7 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
 
       {/* Right column — bottom-anchored, words grow upward (column-reverse) */}
       {!stacked && (
-        <div style={{ ...rightStyle, ...colStyle }}>
+        <div className="hero-words" style={{ ...rightStyle, ...colStyle }}>
           {RIGHT_WORDS.map((w, i) => (
             <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
           ))}
@@ -145,7 +145,7 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
           pascal pfohl — art direction for moving image, content production + motion design — zürich
         </p>
         {stacked && (
-          <div style={{ ...colStyle, display: "flex", flexDirection: "column-reverse", textAlign: "right", alignSelf: "flex-end", marginTop: 16 }}>
+          <div className="hero-words" style={{ ...colStyle, display: "flex", flexDirection: "column-reverse", textAlign: "right", alignSelf: "flex-end", marginTop: 16 }}>
             {RIGHT_WORDS.map((w, i) => (
               <ScrambleText key={w} text={w} isActive={i <= revealedUpTo} />
             ))}

@@ -293,3 +293,11 @@ button:focus-visible,
   outline: 2px solid #E0115F;
   outline-offset: 3px;
 }
+
+/* Low viewports (phones in landscape): no room for the hero word columns —
+   title + subline stay */
+@media (max-height: 499px) {
+  .hero-words {
+    display: none !important;
+  }
+}
