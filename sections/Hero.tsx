@@ -60,7 +60,8 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
 
   /* Narrow screens: no room beside the title — left column sits above it,
      right column below the subline (rendered inside the subline block). */
-  const stacked = pos.ready && vw < 768;
+  const narrow  = vw < 768;
+  const stacked = pos.ready && narrow;
 
   const leftStyle: React.CSSProperties = stacked
     /* bottom edge 16 px above the measured title top; grows upward, never over the title */
@@ -75,7 +76,7 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
 
   const colStyle: React.CSSProperties = {
     fontFamily:    "var(--font-mono)",
-    fontSize:      "clamp(0.55rem, 0.85vw, 0.72rem)",
+    fontSize:      narrow ? "0.625rem" : "clamp(0.55rem, 0.85vw, 0.72rem)",   // mobile: 10 px minimum
     lineHeight:    2,
     letterSpacing: "0.04em",
     textTransform: "uppercase",
@@ -133,7 +134,7 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
             margin:        0,
             textAlign:     "center",
             fontFamily:    "var(--font-mono)",
-            fontSize:      "clamp(0.55rem, 0.85vw, 0.72rem)",
+            fontSize:      narrow ? "0.6875rem" : "clamp(0.55rem, 0.85vw, 0.72rem)",   // mobile: 11 px minimum
             lineHeight:    1.6,
             letterSpacing: "0.04em",
             color:         "rgba(255,255,255,0.6)",
