@@ -1,7 +1,7 @@
 export type Layout = "video16x9" | "grid9x16" | "timeline";
 
 export interface Project {
-  id:           string;      // R2 storage key — never changes once media is uploaded
+  id:           string;      // anchor id; media folder = slug
   displayId?:   string;      // UI-only number label; falls back to id if omitted
   slug:         string;
   name:         string;
@@ -91,9 +91,9 @@ export const PROJECTS: Project[] = [
     /*
      * PERSONAL PROJECT — Media placement guide
      * ─────────────────────────────────────────
-     * Panel images  → public/projects/09/panel-01.jpg, panel-02.jpg, …
-     * Social videos → public/projects/09/grid-01.mp4,  grid-02.mp4,  …
-     * Thumbnail     → public/projects/09/thumb.jpg
+     * Panel images  → projects/personal/panel-01.jpg, panel-02.jpg, …
+     * Social videos → projects/personal/grid-01.mp4,  grid-02.mp4,  …
+     * Thumbnail     → projects/personal/thumb.jpg
      *
      * After adding files: update panelCount / gridCount to the actual file count
      * so the components render the right number of frames.
@@ -103,7 +103,7 @@ export const PROJECTS: Project[] = [
     layout: "grid9x16", extra: "timeline", accent: "#2c2c2c",
     tagline:     "analog moments + personal work",
     description: "A collection of analog photography and personal creative projects — work made for the love of it.",
-    panelCount:  5,  // panel-01…panel-05 in projects/09/
-    gridCount:   5,  // grid-01…grid-05.mp4 in projects/09/
+    panelCount:  5,  // panel-01…panel-05 in projects/personal/
+    gridCount:   5,  // grid-01…grid-05.mp4 in projects/personal/
   },
 ];

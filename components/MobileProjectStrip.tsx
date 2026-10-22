@@ -20,8 +20,8 @@ function buildMediaItems(project: Project): MediaItem[] {
   if (project.layout === "video16x9") {
     items.push({
       kind:   "video",
-      src:    videoUrl(project.id, "hero"),
-      poster: imageUrl(project.id, "poster"),
+      src:    videoUrl(project.slug, "hero"),
+      poster: imageUrl(project.slug, "poster"),
     });
   }
 
@@ -31,8 +31,8 @@ function buildMediaItems(project: Project): MediaItem[] {
       const key = `grid-${String(i).padStart(2, "0")}`;
       items.push({
         kind:   "video",
-        src:    videoUrl(project.id, key),
-        poster: imageUrl(project.id, `${key}-thumb`),
+        src:    videoUrl(project.slug, key),
+        poster: imageUrl(project.slug, `${key}-thumb`),
       });
     }
   }
@@ -43,7 +43,7 @@ function buildMediaItems(project: Project): MediaItem[] {
       const key = `panel-${String(i).padStart(2, "0")}`;
       items.push({
         kind: "image",
-        src:  imageUrl(project.id, key),
+        src:  imageUrl(project.slug, key),
         alt:  `${project.name} — photo ${i}`,
       });
     }

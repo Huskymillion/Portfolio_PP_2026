@@ -56,7 +56,7 @@ function Thumbnail({ project, visible, x, y, mobile = false }: {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={imageUrl(project.id, "thumb")}
+            src={imageUrl(project.slug, "thumb")}
             alt=""
             loading="lazy"
             decoding="async"
@@ -491,8 +491,8 @@ export function FullscreenVideo({ project }: { project: Project }) {
       {srcActive && (
         <video
           ref={videoRef}
-          src={videoUrl(project.id, "hero")}
-          poster={imageUrl(project.id, "poster")}
+          src={videoUrl(project.slug, "hero")}
+          poster={imageUrl(project.slug, "poster")}
           autoPlay muted loop playsInline preload="none"
           onCanPlay={() => setReady(true)}
           onPlay={() => setPaused(false)}
@@ -741,8 +741,8 @@ function SocialCard({
       {srcReady && (
         <video
           ref={videoRef}
-          src={videoUrl(project.id, `grid-${n}`)}
-          poster={imageUrl(project.id, `grid-${n}-thumb`)}
+          src={videoUrl(project.slug, `grid-${n}`)}
+          poster={imageUrl(project.slug, `grid-${n}-thumb`)}
           loop playsInline preload="none"
           muted={muted}
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
@@ -850,8 +850,8 @@ export function SocialGrid({ project }: { project: Project }) {
           return (
             <MobileVideoCard
               key={i}
-              src={srcReady ? videoUrl(project.id, `grid-${n}`) : undefined}
-              poster={imageUrl(project.id, `grid-${n}-thumb`)}
+              src={srcReady ? videoUrl(project.slug, `grid-${n}`) : undefined}
+              poster={imageUrl(project.slug, `grid-${n}-thumb`)}
               accent={project.accent}
               label={`${project.name} / ${n}`}
               forcePause={offScreen}
@@ -1042,7 +1042,7 @@ export function HorizontalTimeline({ project }: { project: Project }) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={imageUrl(project.id, `panel-${String(i + 1).padStart(2, "0")}`)}
+                src={imageUrl(project.slug, `panel-${String(i + 1).padStart(2, "0")}`)}
                 alt=""
                 loading="eager"
                 decoding="async"

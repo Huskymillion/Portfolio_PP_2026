@@ -7,12 +7,12 @@
  *
  * R2 BUCKET STRUCTURE
  * ────────────────────
- *  projects/{id}/hero.mp4
- *  projects/{id}/poster.jpg
- *  projects/{id}/thumb.jpg
- *  projects/{id}/panel-01.jpg … panel-05.jpg
- *  projects/{id}/grid-01.mp4  … grid-05.mp4
- *  projects/{id}/grid-01-thumb.jpg … grid-05-thumb.jpg
+ *  projects/{slug}/hero.mp4
+ *  projects/{slug}/poster.jpg
+ *  projects/{slug}/thumb.jpg
+ *  projects/{slug}/panel-01.jpg … panel-05.jpg
+ *  projects/{slug}/grid-01.mp4  … grid-05.mp4
+ *  projects/{slug}/grid-01-thumb.jpg … grid-05-thumb.jpg
  *
  * HOW TO OVERRIDE A FILE WITH GOOGLE DRIVE
  * ─────────────────────────────────────────
@@ -35,47 +35,47 @@ export function mediaUrl(path: string): string {
 type DriveMap = Record<string, string>;
 
 const DRIVE_IDS: Record<string, DriveMap> = {
-  "01": { // köttur
+  "kottur": {
     "hero": "", "poster": "", "thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "", "panel-05": "",
   },
-  "02": { // freundliche grüsse
+  "freundliche-gruesse": {
     "thumb": "",
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "", "panel-05": "",
   },
-  "03b": { // riders rights
+  "riders-rights": {
     "hero": "", "poster": "", "thumb": "",
   },
-  "03": { // ewz
+  "ewz": {
     "thumb": "",
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
   },
-  "04": { // sfv
+  "sfv": {
     "thumb": "",
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
   },
-  "05": { // schweizer paraplegiker stiftung
+  "schweizer-paraplegiker-stiftung": {
     "hero": "", "poster": "", "thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "",
   },
-  "06": { // kapo bern
+  "kapo-bern": {
     "hero": "", "poster": "", "thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "",
   },
-  "07": { // kfh
+  "kfh": {
     "hero": "", "poster": "", "thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "",
   },
-  "08": { // mawave
+  "mawave": {
     "thumb": "",
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
     "grid-01-thumb": "", "grid-02-thumb": "", "grid-03-thumb": "", "grid-04-thumb": "", "grid-05-thumb": "",
   },
-  "09": { // personal
+  "personal": {
     "thumb": "",
     "panel-01": "", "panel-02": "", "panel-03": "", "panel-04": "", "panel-05": "",
     "grid-01": "", "grid-02": "", "grid-03": "", "grid-04": "", "grid-05": "",
@@ -92,15 +92,15 @@ function driveVideo(id: string) {
 }
 
 /** Image URL — Drive if ID set, else R2. */
-export function imageUrl(projectId: string, key: string, ext = "jpg"): string {
-  const id = DRIVE_IDS[projectId]?.[key];
+export function imageUrl(slug: string, key: string, ext = "jpg"): string {
+  const id = DRIVE_IDS[slug]?.[key];
   if (id) return driveImage(id);
-  return `${R2_BASE}/projects/${projectId}/${key}.${ext}`;
+  return `${R2_BASE}/projects/${slug}/${key}.${ext}`;
 }
 
 /** Video URL — Drive if ID set, else R2. */
-export function videoUrl(projectId: string, key: string): string {
-  const id = DRIVE_IDS[projectId]?.[key];
+export function videoUrl(slug: string, key: string): string {
+  const id = DRIVE_IDS[slug]?.[key];
   if (id) return driveVideo(id);
-  return `${R2_BASE}/projects/${projectId}/${key}.mp4`;
+  return `${R2_BASE}/projects/${slug}/${key}.mp4`;
 }
