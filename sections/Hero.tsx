@@ -103,6 +103,30 @@ function HeroInner({ revealedUpTo, pos, titleRef, servusRef, helloRef, wrapperRe
         </p>
       </div>
 
+      {/* Subline — centred directly below the title block */}
+      <p
+        style={{
+          position:      "absolute",
+          top:           pos.ready ? pos.helloBottom + 16 : "calc(50% + 0.84 * clamp(4.5rem, 13.5vw, 15rem) + 1rem)",
+          left:          "50%",
+          transform:     "translateX(-50%)",
+          width:         "max-content",
+          /* Narrow screens: the word columns reach below the title — keep the subline within the title width */
+          maxWidth:      pos.ready && vw < 768 ? Math.min(vw * 0.9, pos.titleRight - pos.titleLeft) : "90vw",
+          margin:        0,
+          textAlign:     "center",
+          fontFamily:    "var(--font-mono)",
+          fontSize:      "clamp(0.55rem, 0.85vw, 0.72rem)",
+          lineHeight:    1.6,
+          letterSpacing: "0.04em",
+          color:         "rgba(255,255,255,0.6)",
+          textTransform: "lowercase",
+          pointerEvents: "none",
+        }}
+      >
+        pascal pfohl — art direction for moving image, content production + motion design — zürich
+      </p>
+
     </div>
   );
 }
@@ -197,6 +221,7 @@ export function Hero() {
 
   return (
     <div ref={wrapperRef} id="hero" style={{ height: heroHeight, position: "relative" }}>
+      <h1 className="sr-only">Pascal Pfohl</h1>
       {/*
         * FIX 1 — background: "#000" added to the sticky container.
         * Previously the container had no background, so as the two halves
@@ -210,8 +235,8 @@ export function Hero() {
           <HeroInner revealedUpTo={revealedUpTo} pos={pos} titleRef={titleRef} servusRef={servusRef} helloRef={helloRef} wrapperRef={wrapperRef} />
         </m.div>
 
-        {/* Bottom half */}
-        <m.div style={{ position: "absolute", inset: 0, clipPath: "inset(50% 0 0 0)", y: bottomY, willChange: "transform" }}>
+        {/* Bottom half — visual duplicate of the top half, hidden from assistive tech */}
+        <m.div aria-hidden="true" style={{ position: "absolute", inset: 0, clipPath: "inset(50% 0 0 0)", y: bottomY, willChange: "transform" }}>
           <HeroInner revealedUpTo={revealedUpTo} pos={pos} wrapperRef={wrapperRef} />
         </m.div>
 

@@ -81,8 +81,10 @@ export function Brands() {
             borderBottom:  "1px solid rgba(0,0,0,0.12)",
           }}
         >
-          <span
+          <h2
             style={{
+              display:       "inline",
+              margin:        0,
               fontFamily:    FONT_BRIER,
               fontSize:      "clamp(1.8rem, 4vw, 4rem)",
               fontWeight:    900,
@@ -93,7 +95,7 @@ export function Brands() {
             }}
           >
             clients
-          </span>
+          </h2>
         </div>
 
         {/* Inline flow with middot separators */}

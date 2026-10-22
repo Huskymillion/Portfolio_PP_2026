@@ -8,7 +8,7 @@ const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 
 /* ─── Media item types ──────────────────────────── */
 
-type VideoItem = { kind: "video"; src: string; poster: string };
+type VideoItem = { kind: "video"; src: string; poster: string; label?: string };
 type ImageItem = { kind: "image"; src: string; alt: string };
 type MediaItem = VideoItem | ImageItem;
 
@@ -22,6 +22,7 @@ function buildMediaItems(project: Project): MediaItem[] {
       kind:   "video",
       src:    videoUrl(project.slug, "hero"),
       poster: imageUrl(project.slug, "poster"),
+      label:  `${project.name} — ${project.tagline}`,
     });
   }
 
@@ -33,6 +34,7 @@ function buildMediaItems(project: Project): MediaItem[] {
         kind:   "video",
         src:    videoUrl(project.slug, key),
         poster: imageUrl(project.slug, `${key}-thumb`),
+        label:  project.gridCaptions?.[i - 1],
       });
     }
   }
@@ -161,6 +163,7 @@ function VideoPanel({
           ref={videoRef}
           src={item.src}
           poster={item.poster}
+          aria-label={item.label}
           autoPlay
           muted
           loop

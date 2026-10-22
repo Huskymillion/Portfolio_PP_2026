@@ -13,6 +13,9 @@ const ACCENT     = "#E0115F";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 
+/* Role / award / credits lines in the case description block */
+const CREDIT_TEXT: React.CSSProperties = { fontFamily: FONT_MONA, fontSize: "clamp(0.7rem, 0.9vw, 0.82rem)", lineHeight: 1.6 };
+
 export type { Project, Layout };
 
 /* ─── Thumbnail hover card ──────────────────────── */
@@ -229,9 +232,9 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
 
         {/* Section label */}
         <div style={{ display: "flex", alignItems: "baseline", gap: "2rem", marginBottom: "clamp(2rem, 5vh, 4rem)", borderTop: "2px solid #0a0a0a", paddingTop: "1.5rem" }}>
-          <span style={{ fontFamily: FONT_BRIER, fontSize: "clamp(2rem, 5vw, 5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1 }}>
+          <h2 style={{ fontFamily: FONT_BRIER, fontSize: "clamp(2rem, 5vw, 5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, margin: 0 }}>
             Work
-          </span>
+          </h2>
           <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto" }}>
             Selected works spanning campaign design,<br />branding, art direction, video, motion, and more.
           </span>
@@ -493,6 +496,7 @@ export function FullscreenVideo({ project }: { project: Project }) {
           ref={videoRef}
           src={videoUrl(project.slug, "hero")}
           poster={imageUrl(project.slug, "poster")}
+          aria-label={`${project.name} — ${project.tagline}`}
           autoPlay muted loop playsInline preload="none"
           onCanPlay={() => setReady(true)}
           onPlay={() => setPaused(false)}
@@ -586,11 +590,12 @@ function useCardDims() {
 
 /* ─── Mobile social card — vertical list item ─── */
 
-function MobileVideoCard({ src, poster, accent, label, forcePause }: {
+function MobileVideoCard({ src, poster, accent, label, caption, forcePause }: {
   src:        string | undefined;
   poster:     string;
   accent:     string;
   label:      string;
+  caption?:   string;
   forcePause: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -623,6 +628,7 @@ function MobileVideoCard({ src, poster, accent, label, forcePause }: {
           ref={videoRef}
           src={src}
           poster={poster}
+          aria-label={caption}
           loop playsInline preload="none"
           style={{ display: "block", width: "100%", height: "auto" }}
         />
@@ -707,7 +713,8 @@ function SocialCard({
     setMuted(nowMuted);
   };
 
-  const n = String(index + 1).padStart(2, "0");
+  const n       = String(index + 1).padStart(2, "0");
+  const caption = project.gridCaptions?.[index];
 
   return (
     <m.div
@@ -743,6 +750,7 @@ function SocialCard({
           ref={videoRef}
           src={videoUrl(project.slug, `grid-${n}`)}
           poster={imageUrl(project.slug, `grid-${n}-thumb`)}
+          aria-label={caption}
           loop playsInline preload="none"
           muted={muted}
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
@@ -772,9 +780,15 @@ function SocialCard({
 
       {/* Label + mute toggle */}
       <div style={{ position: "relative", zIndex: 2, padding: "0.75rem", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-        <div style={{ fontFamily: FONT_MONA, fontSize: "0.58rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          {project.name} / {n}
-        </div>
+        {caption ? (
+          <div style={{ fontFamily: FONT_MONA, fontSize: "0.72rem", color: "#fff", textTransform: "lowercase" }}>
+            {caption}
+          </div>
+        ) : (
+          <div style={{ fontFamily: FONT_MONA, fontSize: "0.58rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            {project.name} / {n}
+          </div>
+        )}
         {isHovered && (
           <button
             aria-label={muted ? "Unmute video" : "Mute video"}
@@ -853,7 +867,8 @@ export function SocialGrid({ project }: { project: Project }) {
               src={srcReady ? videoUrl(project.slug, `grid-${n}`) : undefined}
               poster={imageUrl(project.slug, `grid-${n}-thumb`)}
               accent={project.accent}
-              label={`${project.name} / ${n}`}
+              label={project.gridCaptions?.[i] ?? `${project.name} / ${n}`}
+              caption={project.gridCaptions?.[i]}
               forcePause={offScreen}
             />
           );
@@ -1082,9 +1097,9 @@ function CaseStudyMeta({ project, textPrimary, textMuted, textSubtle }: {
           {project.displayId ?? project.id}
         </span>
         <div>
-          <div style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: textPrimary }}>
+          <h3 style={{ fontFamily: FONT_BRIER, fontSize: "clamp(1.6rem, 4vw, 4.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, color: textPrimary, margin: 0 }}>
             {project.name}
-          </div>
+          </h3>
           {project.tagline && (
             <div style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.72rem, 1vw, 0.92rem)", fontStyle: "italic", color: textSubtle, marginTop: "0.35em", letterSpacing: "0.01em" }}>
               {project.tagline}
@@ -1117,7 +1132,7 @@ export function CaseStudy({ project }: { project: Project }) {
   const textSubtle  = dark ? "rgba(255,255,255,0.35)" : "#777";
 
   return (
-    <section
+    <article
       id={`case-${project.slug}`}
       style={{
         background: sectionBg,
@@ -1182,6 +1197,29 @@ export function CaseStudy({ project }: { project: Project }) {
             <p style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.88rem, 1.1vw, 1rem)", fontWeight: 400, color: textMuted, lineHeight: 1.7, maxWidth: "800px", margin: 0 }}>
               {project.description}
             </p>
+            {project.role && (
+              <p style={{ ...CREDIT_TEXT, color: ACCENT, textTransform: "lowercase", margin: "0.75rem 0 0" }}>
+                role — {project.role}
+              </p>
+            )}
+            {project.award && (
+              <p style={{ ...CREDIT_TEXT, color: textPrimary, margin: "0.25rem 0 0" }}>
+                award — {project.award}
+              </p>
+            )}
+            {project.credits && project.credits.length > 0 && (
+              <dl style={{ ...CREDIT_TEXT, marginTop: "0.75rem", marginBottom: 0, maxWidth: "800px" }}>
+                {project.credits.map((c, i) => (
+                  <div key={c.label} style={{ display: "inline" }}>
+                    <dt style={{ display: "inline", color: textMuted }}>
+                      {i > 0 && <span aria-hidden="true"> · </span>}
+                      {c.label}
+                    </dt>
+                    <dd style={{ display: "inline", color: textSubtle, marginLeft: "0.4em" }}>{c.names}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </m.div>
         )}
 
@@ -1209,6 +1247,6 @@ export function CaseStudy({ project }: { project: Project }) {
 
       {/* Desktop Block A — Horizontal timeline */}
       {!isMobile && hasTimeline && <HorizontalTimeline project={project} />}
-    </section>
+    </article>
   );
 }

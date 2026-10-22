@@ -146,6 +146,8 @@ export function Contact() {
         }
       `}</style>
 
+      <h2 className="sr-only">contact</h2>
+
       {/* ── Row 0 : Header — Year + Location + Name ── */}
       <div
         style={{

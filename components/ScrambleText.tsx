@@ -67,7 +67,8 @@ export function ScrambleText({ text, isActive, className, style }: Props) {
       onMouseEnter={isActive === undefined ? () => { setHovered(true); reveal(); } : undefined}
       onMouseLeave={isActive === undefined ? () => { setHovered(false); conceal(); } : undefined}
     >
-      {display}
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{display}</span>
     </motion.span>
   );
 }
