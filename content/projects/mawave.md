@@ -1,15 +1,19 @@
 ---
 title: mawave
 slug: mawave
-year: 2024
+year: 2022
 category: Agency
 client: mawave
 accent: "#3d0000"
 layout: grid9x16
 hasTimeline: false
-services: video + motion + concept + photography + edit + design
-tagline: we translate brands to social media
-description: As creative content producer, responsible for the full outbound visual representation and concept — translating brands into scroll-stopping social content.
+services: production setup + concept + camera + edit
+tagline: from smartphone to in-house studio
+description: "First year in paid content for clients like XXXLutz, OBI, Westwing and HelloFresh. Then in-house: a production built from scratch (equipment, studio, team training) and the agency's own content, including the personal brand of founder Jason Modemann."
+type: social-first agency, munich · 2022–2024
+role: "2022–23 creative designer, paid content · 2023–24 creative content producer, in-house marketing: production setup · visual concept · format development · camera · edit"
+credits:
+  - { label: Agency, names: "Mawave Marketing GmbH, Munich" }
 tags:
   - video
   - motion
