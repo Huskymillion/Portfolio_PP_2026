@@ -195,7 +195,7 @@ export function WorkIndex({ projects: propProjects }: { projects?: Project[] } =
           <h2 style={{ fontFamily: FONT_BRIER, fontSize: "clamp(2rem, 5vw, 5rem)", fontWeight: 900, letterSpacing: "-0.03em", textTransform: "uppercase", lineHeight: 1, margin: 0 }}>
             Work
           </h2>
-          <span style={{ fontFamily: FONT_MONA, fontSize: "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto",
+          <span style={{ fontFamily: FONT_MONA, fontSize: isMobile ? "0.75rem" : "clamp(0.65rem, 1vw, 0.85rem)", color: "#555", letterSpacing: "0.06em", textTransform: "uppercase", marginLeft: "auto",
             /* Mobile: keep clear of the fixed menu button (44 px + 1rem inset + 0.5rem gap) */
             paddingRight: isMobile ? "max(0px, calc(44px + 1.5rem - clamp(1.5rem, 5vw, 5rem)))" : 0 }}>
             selected work. moving image from idea to final edit.
