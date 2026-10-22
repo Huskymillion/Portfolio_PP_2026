@@ -5,10 +5,11 @@ import { imageUrl, videoUrl } from "@/lib/media";
 import type { Project } from "@/lib/projects";
 
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
+const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 
 /* ─── Media item types ──────────────────────────── */
 
-type VideoItem = { kind: "video"; src: string; poster: string; label?: string };
+type VideoItem = { kind: "video"; src: string; poster: string; label?: string; caption?: string };
 type ImageItem = { kind: "image"; src: string; alt: string };
 type MediaItem = VideoItem | ImageItem;
 
@@ -34,7 +35,8 @@ function buildMediaItems(project: Project): MediaItem[] {
         kind:   "video",
         src:    videoUrl(project.slug, key),
         poster: imageUrl(project.slug, `${key}-thumb`),
-        label:  project.gridCaptions?.[i - 1],
+        label:   project.gridCaptions?.[i - 1],
+        caption: project.gridCaptions?.[i - 1],
       });
     }
   }
@@ -171,6 +173,16 @@ function VideoPanel({
           preload="none"
           style={{ display: "block", width: "100%", height: "auto", borderRadius: 8 }}
         />
+      )}
+
+      {/* Grid caption — same style as the mobile social card labels */}
+      {item.caption && (
+        <>
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.7))", borderRadius: "0 0 8px 8px", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "0.75rem", left: "0.75rem", maxWidth: "calc(100% - 3.75rem)", fontFamily: FONT_MONA, fontSize: "0.6rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase", pointerEvents: "none" }}>
+            {item.caption}
+          </div>
+        </>
       )}
 
       {/* Fix 2 — Square-frame play indicator */}

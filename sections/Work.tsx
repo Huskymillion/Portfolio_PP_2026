@@ -781,9 +781,12 @@ function SocialCard({
       {/* Label + mute toggle */}
       <div style={{ position: "relative", zIndex: 2, padding: "0.75rem", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         {caption ? (
-          <div style={{ fontFamily: FONT_MONA, fontSize: "0.72rem", color: "#fff", textTransform: "lowercase" }}>
-            {caption}
-          </div>
+          /* Caption only on the active (hovered / playing) card */
+          (isHovered || playing) ? (
+            <div style={{ fontFamily: FONT_MONA, fontSize: "0.72rem", color: "#fff", textTransform: "lowercase" }}>
+              {caption}
+            </div>
+          ) : <span />
         ) : (
           <div style={{ fontFamily: FONT_MONA, fontSize: "0.58rem", color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>
             {project.name} / {n}
