@@ -7,13 +7,14 @@ const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
 
 const BRANDS = [
-  "alh gruppe", "alpha tauri", "apollo", "asset metrix", "atos unify",
-  "caritas", "dachser", "daiichi sankyo", "ewz", "exlibris",
-  "faz", "fussball kann mehr", "globus baumarkt", "iba", "immoscout24",
-  "kantonsspital winterthur", "kantonspolizei bern", "kfh", "migros ici",
-  "nzz am sonntag", "obi", "radicant", "ricardo", "schweizer fussballverband",
-  "schweizer paraplegiker stiftung", "sgm", "siemens", "sloggi",
-  "stadt zürich", "tkmaxx", "westwing", "woz", "xxxlutz", "yfood",
+  "alh gruppe", "alphatauri", "apollo", "asset metrix", "atos unify",
+  "caritas", "dachser", "daiichi sankyo", "ekz", "esn", "ewz", "ex libris",
+  "faz", "fussball kann mehr", "globus baumarkt", "hellofresh", "iba", "immoscout24",
+  "kantonspolizei bern", "kantonsspital winterthur", "kfh", "migros ici",
+  "nzz am sonntag", "obi", "radicant", "ricardo", "schweiz tourismus",
+  "schweizer fussballverband", "schweizer paraplegiker-stiftung", "sgm", "siemens",
+  "sloggi", "snocks", "stadt zürich", "the female company", "tk maxx",
+  "westwing", "woz", "xxxlutz", "yfood",
 ];
 
 function useIsDesktop() {
