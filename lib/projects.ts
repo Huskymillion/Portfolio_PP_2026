@@ -1,5 +1,7 @@
 export type Layout = "video16x9" | "grid9x16" | "timeline";
 
+export interface Credit { label: string; names: string }
+
 export interface Project {
   id:           string;      // internal id (displayId fallback) — anchor + media folder = slug
   displayId?:   string;      // UI-only number label; falls back to id if omitted
@@ -15,6 +17,10 @@ export interface Project {
   panelCount?:  number;
   gridCount?:   number;   // social card count; omit = default 5; 0 = don't render
   darkSection?: boolean;  // true = section bg #111, text inverted to white
+  role?:          string;     // volle Rolle, im Case sichtbar
+  award?:         string;     // eine Zeile, optional
+  credits?:       Credit[];   // Team, getrennt von der Rolle
+  gridCaptions?:  string[];   // Captions für grid-01…05, Reihenfolge = Dateinummer
 }
 
 export const PROJECTS: Project[] = [

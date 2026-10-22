@@ -1,7 +1,7 @@
 import fs   from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { PROJECTS, type Project } from "./projects";
+import { PROJECTS, type Project, type Credit } from "./projects";
 
 // Maps CMS slug (filename without .md) → static project id
 const SLUG_TO_ID: Record<string, string> = {
@@ -14,6 +14,8 @@ const SLUG_TO_ID: Record<string, string> = {
   "kfh":                          "07",
   "mawave":                       "08",
   "personal":                     "09",
+  "riders-rights":                "03b",
+  "woz":                          "10",
 };
 
 export async function getProjectsFromCMS(): Promise<Project[]> {
@@ -39,12 +41,17 @@ export async function getProjectsFromCMS(): Promise<Project[]> {
       return {
         ...p,
         name:        (data.title        as string  | undefined) ?? p.name,
+        type:        (data.type         as string  | undefined) ?? p.type,
         accent:      (data.accent       as string  | undefined) ?? p.accent,
         layout:      (data.layout       as Project["layout"] | undefined) ?? p.layout,
         extra:       data.hasTimeline   ? ("timeline" as const) : p.extra,
         services:    (data.services     as string  | undefined) ?? p.services,
         tagline:     (data.tagline      as string  | undefined) ?? p.tagline,
         description: (data.description  as string  | undefined) ?? p.description,
+        role:         (data.role         as string   | undefined) ?? p.role,
+        award:        (data.award        as string   | undefined) ?? p.award,
+        credits:      (data.credits      as Credit[] | undefined) ?? p.credits,
+        gridCaptions: (data.gridCaptions as string[] | undefined) ?? p.gridCaptions,
       };
     });
 }

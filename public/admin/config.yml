@@ -32,6 +32,17 @@ collections:
           - { label: File,    name: file,    widget: file }
           - { label: Caption, name: caption, widget: string, required: false }
       - { label: Services,    name: services,    widget: string }
+      - { label: Type (index line), name: type, widget: string, required: false }
+      - { label: Role (full, shown in case), name: role, widget: string, required: false }
+      - { label: Award (one line), name: award, widget: string, required: false }
+      - label: Credits
+        name: credits
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Names, name: names, widget: string }
+      - { label: Grid Captions (order = grid-01…05), name: gridCaptions, widget: list, required: false }
       - { label: Tagline,     name: tagline,     widget: string, required: false, hint: "Short italic line shown under the project title — one sentence max" }
       - { label: Description, name: description, widget: text,   required: false, hint: "Context paragraph shown below the media. 1–3 sentences." }
       - { label: Tags,        name: tags,        widget: list,    required: false }
