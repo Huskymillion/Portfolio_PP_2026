@@ -1090,7 +1090,7 @@ export function CaseStudy({ project }: { project: Project }) {
   const sectionBg   = dark ? "#000000" : "#fafafa";
   const textPrimary = dark ? "#fafafa"  : "#0a0a0a";
   const textMuted   = dark ? "rgba(255,255,255,0.5)"  : "#555";
-  const textSubtle  = dark ? "rgba(255,255,255,0.35)" : "#777";
+  const textSubtle  = dark ? "rgba(255,255,255,0.55)" : "#6b6b6b";
 
   return (
     <article
