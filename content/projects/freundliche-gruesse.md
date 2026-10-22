@@ -10,8 +10,8 @@ hasTimeline: true
 services: concept + camera + edit + motion
 tagline: more from two years at freundliche grüsse
 description: "Two years of concept-to-final-edit production, with AI-supported workflows built in. More from that time:"
-type: creative agency, zürich · 2024–2026
-role: creative content producer · concept to final edit · camera · edit · motion design · ai-supported production
+type: creative agency · zürich
+role: concept · camera · edit · motion design · ai-supported production
 gridCaptions:
   - "freundliche grüsse: worcation edit"
   - "sfv × awsl: «wir spielen weiter»"

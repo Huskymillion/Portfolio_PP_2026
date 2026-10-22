@@ -69,14 +69,14 @@ export const PROJECTS: Project[] = [
     darkSection: true,
   },
   {
-    id: "08", displayId: "07", slug: "mawave", name: "mawave", type: "social-first agency, munich · 2022–2024",
+    id: "08", displayId: "07", slug: "mawave", name: "mawave", type: "social-first agency · munich",
     services: "production setup + concept + camera + edit",
     layout: "grid9x16", accent: "#3d0000",
     tagline:     "from smartphone to in-house studio",
-    description: "First year in paid content for clients like XXXLutz, OBI, Westwing and HelloFresh. Then in-house: a production built from scratch (equipment, studio, team training) and the agency's own content, including the personal brand of founder Jason Modemann.",
+    description: "Mawave turns brands into social content, but its own channels had no production behind them. What followed: an in-house studio with equipment, a rental system and team training, and one visual language across the agency's TikTok, Instagram and LinkedIn, its case films and the personal brand of founder Jason Modemann.",
   },
   {
-    id: "02", displayId: "08", slug: "freundliche-gruesse", name: "freundliche grüsse", type: "creative agency, zürich · 2024–2026",
+    id: "02", displayId: "08", slug: "freundliche-gruesse", name: "freundliche grüsse", type: "creative agency · zürich",
     services: "concept + camera + edit + motion",
     layout: "grid9x16", accent: "#2d2d2d",
     tagline:     "more from two years at freundliche grüsse",
