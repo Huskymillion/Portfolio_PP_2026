@@ -26,13 +26,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     title: "Pascal Pfohl — moving image from idea to final edit",
-    description: "Art direction for moving image, content production + motion design. Zürich.",
+    description: "Portfolio of Pascal Pfohl, Zürich: art direction for moving image, content production + motion design, from idea to final edit.",
     url: "https://www.huskymillion.com", siteName: "Pascal Pfohl — huskymillion",
     locale: "en_US", type: "website",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Pascal Pfohl — portfolio" }],
   },
   twitter: { card: "summary_large_image", title: "Pascal Pfohl — moving image from idea to final edit",
-    description: "Art direction for moving image, content production + motion design. Zürich.", images: ["/og-image.jpg"] },
+    description: "Portfolio of Pascal Pfohl, Zürich: art direction for moving image, content production + motion design, from idea to final edit.", images: ["/og-image.jpg"] },
   icons: {
     icon:  { url: "/favicon.svg", type: "image/svg+xml" },
     apple: "/favicon.svg",
