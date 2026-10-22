@@ -104,7 +104,6 @@ function VideoPanel({
   const videoRef   = useRef<HTMLVideoElement>(null);
   const panelRef   = useRef<HTMLDivElement>(null);
   const pauseRef   = useRef(forcePause);
-  pauseRef.current = forcePause;
 
   const [playing, setPlaying] = useState(false);
   const [muted,   setMuted]   = useState(true); // starts muted (required for autoPlay)
@@ -114,6 +113,7 @@ function VideoPanel({
   /* Respond immediately when the whole section leaves the viewport — and resume
      the visible panel when it comes back (e.g. after a hash jump past the section) */
   useEffect(() => {
+    pauseRef.current = forcePause;
     if (forcePause)              videoRef.current?.pause();
     else if (inStripRef.current) videoRef.current?.play().catch(() => {});
   }, [forcePause]);

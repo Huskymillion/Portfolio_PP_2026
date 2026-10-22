@@ -19,11 +19,11 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     });
 
-    setLenis(instance);
-
     let rafId: number;
+    let published = false;
     function raf(time: number) {
       instance.raf(time);
+      if (!published) { published = true; setLenis(instance); }   // expose once Lenis is running
       rafId = requestAnimationFrame(raf);
     }
     rafId = requestAnimationFrame(raf);

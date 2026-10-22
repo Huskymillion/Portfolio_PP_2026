@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { m } from "framer-motion";
+import { useMediaQuery } from "@/lib/hooks";
 
 const FONT_MONA  = "'Mona Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
@@ -18,15 +19,7 @@ const BRANDS = [
 ];
 
 function useIsDesktop() {
-  const [is, setIs] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIs(mq.matches);
-    const h = (e: MediaQueryListEvent) => setIs(e.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
-  return is;
+  return useMediaQuery("(min-width: 1024px)");
 }
 
 function BrandName({ name, index }: { name: string; index: number }) {

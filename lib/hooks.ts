@@ -1,15 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+/** Live media-query match. false on the server and during hydration, then the real value. */
+export function useMediaQuery(query: string) {
+  const subscribe = useCallback((onChange: () => void) => {
+    const mq = window.matchMedia(query);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [query]);
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
+}
+
+const noSubscribe = () => () => {};
+
+/** false on the server and during hydration, true once running in the browser. */
+export function useIsClient() {
+  return useSyncExternalStore(noSubscribe, () => true, () => false);
+}
 
 export function useCanHover() {
-  const [canHover, setCanHover] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setCanHover(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setCanHover(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return canHover;
+  return useMediaQuery("(hover: hover) and (pointer: fine)");
 }
 
 /**

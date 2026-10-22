@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { m, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Zap } from "lucide-react";
 import { useLenis } from "./SmoothScrollProvider";
+import { useIsClient } from "@/lib/hooks";
 
 /* ─── Shared ──────────────────────────────────────────── */
 
@@ -205,10 +206,9 @@ const DESKTOP_ITEMS = [
 function DesktopNav() {
   const lenis       = useLenis();
   const { scrollY } = useScroll();
-  const [vh, setVh] = useState(800);
+  // read once on mount — DesktopNav only renders client-side (see PillNav)
+  const [vh]        = useState(() => window.innerHeight);
   const lastTap     = useRef(0);
-
-  useEffect(() => { setVh(window.innerHeight); }, []);
 
   const opacity = useTransform(
     scrollY,
@@ -217,9 +217,8 @@ function DesktopNav() {
   );
   const pointerEvents = useTransform(opacity, (v) => (v < 0.05 ? "none" : "auto"));
 
-  function scrollTo(target: string) {
+  function scrollTo(target: string, now: number) {
     if (target === "#hero") {
-      const now = Date.now();
       if (now - lastTap.current < 300) return;
       lastTap.current = now;
     }
@@ -259,7 +258,7 @@ function DesktopNav() {
           <button
             key={i}
             aria-label={item.label ?? "Back to top"}
-            onClick={() => scrollTo(item.target)}
+            onClick={(e) => scrollTo(item.target, e.timeStamp)}
             style={{
               display:        "flex",
               alignItems:     "center",
@@ -300,8 +299,7 @@ export function PillNav() {
    * Without this, SSR renders the desktop nav on mobile (or vice versa)
    * and React logs a hydration mismatch.
    */
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useIsClient();
   if (!mounted) return null;
 
   return isMobile ? <MobileNav /> : <DesktopNav />;

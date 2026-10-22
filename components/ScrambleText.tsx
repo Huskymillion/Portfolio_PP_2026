@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { m } from "framer-motion";
+import { useIsClient } from "@/lib/hooks";
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>[]{}|^~";
 
@@ -16,12 +17,15 @@ interface Props {
 }
 
 export function ScrambleText({ text, isActive, className, style }: Props) {
-  const [display, setDisplay] = useState(text);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();                                  // plain text on the server / during hydration
+  const [display, setDisplay]           = useState(() => scramble(text));   // scrambled start value once mounted
+  const [scrambledFor, setScrambledFor] = useState(text);
   const [hovered, setHovered] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => { setMounted(true); setDisplay(scramble(text)); }, [text]);
+  // text prop changed → start scrambled again (adjust state during render, no effect)
+  if (scrambledFor !== text) { setScrambledFor(text); setDisplay(scramble(text)); }
+
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
   const clear = () => { if (timer.current) clearInterval(timer.current); };
@@ -68,7 +72,7 @@ export function ScrambleText({ text, isActive, className, style }: Props) {
       onMouseLeave={isActive === undefined ? () => { setHovered(false); conceal(); } : undefined}
     >
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true">{display}</span>
+      <span aria-hidden="true">{mounted ? display : text}</span>
     </m.span>
   );
 }

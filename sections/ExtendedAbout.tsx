@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { m } from "framer-motion";
+import { useMediaQuery } from "@/lib/hooks";
 
 const ACCENT    = "#E0115F";
 const FONT_BRIER = "'Brier', 'Arial Black', Impact, sans-serif";
@@ -127,15 +128,7 @@ function RevealParagraph({ text, delay = 0 }: RevealParagraphProps) {
 }
 
 function useIsDesktop() {
-  const [is, setIs] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIs(mq.matches);
-    const h = (e: MediaQueryListEvent) => setIs(e.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
-  return is;
+  return useMediaQuery("(min-width: 1024px)");
 }
 
 export function ExtendedAbout() {
