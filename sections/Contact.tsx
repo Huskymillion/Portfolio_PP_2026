@@ -212,7 +212,8 @@ export function Contact() {
         <IconNoWash />
         <Sep />
         <Link href="mailto:pascal@kottur.de">
-          pascal@kottur.de
+          {/* lowercase on purpose: copied / read text must be the real address */}
+          <span style={{ textTransform: "none" }}>pascal@kottur.de</span>
         </Link>
         <Sep />
         <span style={{ fontFamily: FONT_BRIER, fontStyle: "italic" }}>&ldquo;&rdquo;</span>
